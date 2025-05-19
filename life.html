@@ -62,7 +62,14 @@
         <p>其中 <strong>${workdays}</strong> 天是社畜日子，<strong>${freeDays}</strong> 天是自由人生。</p>
         <p>你還有大約 <strong>${daysLeft}</strong> 天可以使用。</p>
         <p>整體來說，你已經走過 <strong>${((livedDays / totalDays) * 100).toFixed(1)}%</strong> 的人生。</p>
-      `;
+        <div class="mt-6 text-indigo-800 bg-indigo-100 rounded-lg p-4">
+          <p class="mb-2">🌿 有時候看見這些數字，會讓人突然有點感觸吧？</p>
+          <p class="mb-2">如果你最近在人生方向上有些迷惘，或對未來感到不確定，</p>
+          <p>歡迎來找我聊聊，我可以透過塔羅牌陪你釐清思緒，找到內在的方向。</p>
+        </div>
+        <a href="https://line.me/R/ti/p/@258ruoqh" target="_blank">
+          <button class="mt-4 bg-purple-600 text-white px-5 py-2 rounded hover:bg-purple-700">🔮 找 Diva 占卜一下</button>
+        </a>`;
 
       const ctx = document.getElementById('lifeChart').getContext('2d');
       if (chart) chart.destroy();
