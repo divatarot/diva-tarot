@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diva療癒空間</title>
+  <style>
+    body {
+      background: #eaf4fb;
+      color: #2c3e50;
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 2rem;
+      text-align: center;
+    }
+    h1 {
+      color: #305f94;
+    }
+    .section {
+      background: #fff;
+      padding: 1.5rem;
+      margin: 1rem auto;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      max-width: 600px;
+    }
+    .section h2 {
+      color: #305f94;
+    }
+    .footer {
+      margin-top: 3rem;
+      font-size: 0.9rem;
+      color: #7f8c8d;
+    }
+    a {
+      color: #305f94;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>我是陪伴你的 Diva</h1>
+  <p>這裡是一個讓你在快節奏的生活中，找到片刻寧靜的地方。</p>
+
+  <div class="section" id="lifeStats">
+    <h2>人生計算中...</h2>
+  </div>
+
+  <div class="section" id="blessing">
+    <h2>今日祝福</h2>
+    <p id="blessingText">載入中...</p>
+  </div>
+
+  <div class="footer">
+    想預約療癒占卜？<br />
+    <a href="https://your-form-link.com" target="_blank">點我填寫表單</a>
+  </div>
+
+  <script>
+    const birthDate = new Date("1996-08-20");
+    const workStart = new Date("2018-07-01");
+    const resignDate = new Date("2025-04-30");
+    const lifeExpectancy = 85;
+
+    const today = new Date();
+    const oneDay = 1000 * 60 * 60 * 24;
+
+    const daysLived = Math.floor((today - birthDate) / oneDay);
+    const daysWorked = Math.floor((resignDate - workStart) / oneDay);
+    const daysSinceQuit = today > resignDate ? Math.floor((today - resignDate) / oneDay) : 0;
+    const expectedEnd = new Date(birthDate.getFullYear() + lifeExpectancy, birthDate.getMonth(), birthDate.getDate());
+    const daysLeft = Math.floor((expectedEnd - today) / oneDay);
+
+    document.getElementById("lifeStats").innerHTML = `
+      <h2>屬於你的人生數據</h2>
+      <p>我已經活了 <strong>${daysLived}</strong> 天</p>
+      <p>當社畜了 <strong>${daysWorked}</strong> 天</p>
+      <p>離職後過了 <strong>${daysSinceQuit}</strong> 天</p>
+      <p>預估還剩下 <strong>${daysLeft}</strong> 天可以活</p>
+    `;
+
+    const blessings = [
+      "你已經做得很好了，別太苛責自己。",
+      "慢慢來也沒關係，你正在走在屬於你的節奏裡。",
+      "這世界很吵，但你的心值得安靜地被聽見。",
+      "別忘了，照顧自己也是一種溫柔的勇氣。",
+      "今天的你，也值得被好好擁抱。",
+      "所有情緒都是訊號，不是麻煩。",
+      "即使什麼都不做，也是一種選擇。",
+      "你不是一個人，我在這裡陪你。"
+    ];
+    const random = blessings[Math.floor(Math.random() * blessings.length)];
+    document.getElementById("blessingText").innerText = random;
+  </script>
+</body>
+</html>
