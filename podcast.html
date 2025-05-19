@@ -1,35 +1,42 @@
-<!-- podcast.html - Diva Podcast 分頁 -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Podcast | Diva 療癒空間</title>
+  <title>Diva Podcast | 療癒系聲音空間</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-b from-indigo-50 via-white to-purple-100 text-gray-800 min-h-screen">
-  <!-- 導覽列 -->
+<body class="bg-gradient-to-b from-indigo-50 via-white to-purple-100 text-gray-800">
   <header class="bg-white bg-opacity-70 sticky top-0 z-50 shadow-sm">
     <nav class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
       <div class="text-2xl font-bold text-indigo-700">Diva</div>
       <ul class="flex space-x-6 text-sm font-medium">
         <li><a href="index.html" class="hover:text-blue-600">首頁</a></li>
         <li><a href="service.html" class="hover:text-blue-600">服務</a></li>
-        <li><a href="podcast.html" class="text-blue-600 underline">Podcast</a></li>
         <li><a href="life.html" class="hover:text-blue-600">人生進度</a></li>
+        <li><a href="blog.html" class="hover:text-blue-600">部落格</a></li>
       </ul>
     </nav>
   </header>
 
-  <!-- Podcast 區塊 -->
   <main class="max-w-3xl mx-auto px-6 py-12">
     <h1 class="text-3xl font-bold text-center text-indigo-700 mb-6">🎧 Diva Podcast</h1>
-    <p class="text-lg text-center text-gray-700 mb-6">在這裡，你可以聽見每週的一則心靈指引、療癒聲音與直覺式的反思提醒，讓你的生活多一點靜心與連結。</p>
 
-    <!-- 嵌入 Firstory 播放器（會自動播放最新一集） -->
-    <div class="flex justify-center">
-      <iframe style="border-radius:12px" src="https://open.firstory.me/embed/user/jpblackdog?theme=light" width="100%" height="180" frameborder="0" scrolling="no"></iframe>
-    </div>
+    <p class="text-lg text-gray-700 text-center max-w-2xl mx-auto mb-8">
+      這是一個讓你靜下心來的聲音空間。<br>
+      無論是睡前、焦慮時、或想讓心喘口氣的時刻，
+      都歡迎你戴上耳機，讓我的聲音陪伴你度過每一個需要療癒的瞬間。
+    </p>
+
+    <div class="text-center space-y-6">
+  <div class="max-w-xl mx-auto">
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/0jGRZ16VY5YrOJWJV9IJuZ?utm_source=generator&theme=0" width="100%" height="152" frameborder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+  </div>
+  <a href="https://open.spotify.com/show/0jGRZ16VY5YrOJWJV9IJuZ?si=c_h6dIGURb69HC-lbyMCzw" target="_blank">
+    <button class="bg-indigo-600 text-white px-6 py-3 rounded-lg text-lg hover:bg-indigo-700">🔗 前往 Spotify 收聽</button>
+  </a>
+</div>
+</div>
   </main>
 
   <footer class="text-center text-sm text-gray-500 py-6">
