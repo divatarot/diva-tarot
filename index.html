@@ -1,3 +1,4 @@
+<!-- index.html - Diva官網首頁 -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -6,67 +7,38 @@
   <title>Diva 療癒空間</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gradient-to-b from-blue-50 via-white to-blue-100 text-gray-800 font-sans">
-  <div class="max-w-3xl mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold text-center text-blue-700 mb-4">我是陪伴你的 Diva</h1>
-    <p class="text-center text-lg mb-8">這裡是一個讓你在快節奏的生活中，找到片刻寧靜的地方。</p>
-
-    <!-- 今日祝福 -->
-    <section class="bg-white rounded-2xl shadow p-6 mb-8">
-      <h2 class="text-2xl font-semibold text-blue-600 mb-4">💌 今日的祝福</h2>
-      <p id="blessingText" class="text-xl text-center text-gray-700">載入中...</p>
-    </section>
-
-    <!-- Podcast 區塊 -->
-    <section class="bg-white rounded-2xl shadow p-6 mb-8">
-      <h2 class="text-2xl font-semibold text-blue-600 mb-4">🎧 Podcast 收聽</h2>
-      <iframe src="https://open.firstory.me/user/jpblackdog/platforms" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
-    </section>
-
-    <!-- 服務介紹 -->
-    <section class="bg-white rounded-2xl shadow p-6 mb-8">
-      <h2 class="text-2xl font-semibold text-blue-600 mb-4">🔮 Diva 塔羅療癒</h2>
-      <p class="mb-4">我是Diva，一位沈浸在塔羅與療癒能量中的女子。我相信塔羅不僅是預測工具，更是連結內在智慧的橋樑。每一次的占卜都是一次能量交流，我將陪你看見自己的答案，釋放內在的阻礙。</p>
-      <ul class="list-disc pl-5 space-y-2 mb-4">
-        <li><strong>陪伴療癒：</strong> 用溫柔的方式陪你看見內在的聲音與力量。</li>
-        <li><strong>塔羅交流：</strong> 幫你解析牌面，釐清困惑，找出方向。</li>
-        <li><strong>內在智慧：</strong> 連結內在指引，找到真正屬於你的答案。</li>
+<body class="bg-gradient-to-br from-blue-50 via-white to-purple-100 min-h-screen text-gray-800">
+  <!-- 導覽列 -->
+  <header class="bg-white bg-opacity-70 sticky top-0 z-50 shadow-sm">
+    <nav class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
+      <div class="text-2xl font-bold text-indigo-700">Diva</div>
+      <ul class="flex space-x-6 text-sm font-medium">
+        <li><a href="index.html" class="text-blue-600 hover:underline">首頁</a></li>
+        <li><a href="service.html" class="hover:text-blue-600">服務</a></li>
+        <li><a href="podcast.html" class="hover:text-blue-600">Podcast</a></li>
+        <li><a href="life.html" class="hover:text-blue-600">人生進度</a></li>
       </ul>
-      <p class="mb-2"><strong>📨 文字占卜：</strong> 深思熟慮型適用，一次一題，完整文字解析。</p>
-      <p class="mb-2"><strong>🎙 語音占卜：</strong> 傳遞能量與情感的聲音陪伴，提升療癒感受。</p>
-      <p class="mb-2"><strong>🌟 特別服務：</strong> 高我連結、天使祝福、能量釋放</p>
-      <p class="mt-4"><strong>➕ LINE 好友抽卡：</strong> <a href="https://line.me/R/ti/p/@258ruoqh?oat__id=5358338" class="text-blue-600 underline" target="_blank">點我加好友</a></p>
-    </section>
+    </nav>
+  </header>
 
-    <!-- 人生進度計算機 -->
-    <section class="bg-white rounded-2xl shadow p-6 mb-8">
-      <h2 class="text-2xl font-semibold text-blue-600 mb-4">🕒 人生進度計算機</h2>
-      <label class="block mb-2">🎂 出生日期</label>
-      <input id="birthDate" type="date" class="w-full p-2 border border-gray-300 rounded mb-4" />
+  <!-- Hero 區塊 -->
+  <section class="text-center py-20 px-6">
+    <h1 class="text-4xl md:text-5xl font-bold text-indigo-800 mb-4">我是陪伴你的 Diva</h1>
+    <p class="text-lg text-gray-600 max-w-2xl mx-auto">這裡是一個讓你在快節奏的生活中，找到片刻寧靜與自我連結的地方。歡迎來到屬於你的療癒空間。</p>
+  </section>
 
-      <label class="block mb-2">🧑‍💼 開始上班日期</label>
-      <input id="workDate" type="date" class="w-full p-2 border border-gray-300 rounded mb-4" />
+  <!-- 今日祝福區塊 -->
+  <section class="max-w-xl mx-auto bg-white bg-opacity-80 rounded-xl shadow p-6 mb-12">
+    <h2 class="text-2xl font-semibold text-indigo-600 mb-4">💌 今日的祝福</h2>
+    <p id="blessingText" class="text-center text-lg text-gray-700">載入中...</p>
+  </section>
 
-      <label class="block mb-2">🔮 預估壽命（歲）</label>
-      <input id="lifeExpect" type="number" value="85" class="w-full p-2 border border-gray-300 rounded mb-4" />
+  <!-- Footer -->
+  <footer class="text-center text-sm text-gray-500 py-6">
+    &copy; 2025 Diva Healing. All rights reserved.
+  </footer>
 
-      <button onclick="calculateLife()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">開始計算</button>
-
-      <div id="lifeResult" class="mt-6 text-lg leading-relaxed"></div>
-      <div class="copy-box mt-4 text-sm text-gray-600 bg-gray-50 p-3 rounded" id="copyText" style="display:none;"></div>
-      <button onclick="copyResult()" id="copyBtn" style="display:none;" class="mt-2 bg-blue-400 text-white px-3 py-1 rounded">複製分享語錄</button>
-    </section>
-
-    <!-- 預約區塊 -->
-    <section class="bg-white rounded-2xl shadow p-6 mb-8 text-center">
-      <h2 class="text-2xl font-semibold text-blue-600 mb-4">📅 預約療癒占卜</h2>
-      <p class="mb-4">如果你想得到一段溫柔的陪伴與指引，歡迎透過表單與我聯繫。</p>
-      <a href="https://your-form-link.com" target="_blank">
-        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">前往預約</button>
-      </a>
-    </section>
-  </div>
-
+  <!-- Script for blessing -->
   <script>
     const blessings = [
       "你已經做得很好了，別太苛責自己。",
@@ -74,65 +46,13 @@
       "這世界很吵，但你的心值得安靜地被聽見。",
       "你不是一個人，我在這裡陪你。",
       "別忘了，照顧自己也是一種溫柔的勇氣。",
-      "累了就停下來，這也是一種勇敢。",
       "即使什麼都不做，也是一種選擇。",
-      "願你在不被理解的時候，依然溫柔地活著。",
-      "今天的你，也值得被好好擁抱。",
-      "請相信，你的努力，未來會知道。",
-      "不需要被看懂，只要被善待就好。",
-      "工作只是人生的一部分，你還有更多值得去愛的事。",
-      "你已經熬過人生的大半考驗，剩下的是創造喜歡的人生。",
-      "你的慢，不是錯，只是節奏不同。",
-      "每一段卡關的時期，都是蛻變的起點。",
       "你不是太敏感，是世界太粗糙。",
-      "謝謝你願意撐到今天。",
-      "看見數字，也記得感受生活。",
-      "活著就是一種奇蹟。",
+      "每一段卡關的時期，都是蛻變的起點。",
+      "請相信，你的努力，未來會知道。",
       "你活著，本身就是一種光。✨"
     ];
     document.getElementById("blessingText").innerText = blessings[Math.floor(Math.random() * blessings.length)];
-
-    function calculateLife() {
-      const birth = new Date(document.getElementById("birthDate").value);
-      const work = new Date(document.getElementById("workDate").value);
-      const expect = parseInt(document.getElementById("lifeExpect").value);
-      const today = new Date();
-      if (!birth || !expect) return;
-
-      const msDay = 1000 * 60 * 60 * 24;
-      const daysLived = Math.floor((today - birth) / msDay);
-      const daysLeft = Math.floor((new Date(birth.getFullYear() + expect, birth.getMonth(), birth.getDate()) - today) / msDay);
-      const workDays = work ? Math.floor((today - work) / msDay) : 0;
-      const workPercent = ((workDays / (daysLived + daysLeft)) * 100).toFixed(1);
-      const lifePercent = ((daysLived / (daysLived + daysLeft)) * 100).toFixed(1);
-
-      const html = `
-        <p>你已經登入人生 <strong>${daysLived}</strong> 天</p>
-        <p>預估還可以活 <strong>${daysLeft}</strong> 天</p>
-        <p>你當社畜了 <strong>${workDays}</strong> 天</p>
-        <p>工作佔你人生的約 <strong>${workPercent}%</strong></p>
-        <p class="mt-4 text-blue-600 font-semibold">🧠 給你的提醒：工作只是人生的一部分，你還有更多值得體驗的事。</p>
-        <div class='w-full bg-gray-200 rounded h-4 mt-4'>
-          <div class='bg-blue-600 h-4 rounded text-white text-xs text-right pr-2' style='width:${lifePercent}%;'>人生 ${lifePercent}%</div>
-        </div>
-        <div class='w-full bg-gray-100 rounded h-4 mt-2'>
-          <div class='bg-blue-300 h-4 rounded text-white text-xs text-right pr-2' style='width:${workPercent}%;'>社畜 ${workPercent}%</div>
-        </div>
-      `;
-      document.getElementById("lifeResult").innerHTML = html;
-
-      const copyText = `我已經活了 ${daysLived} 天，其中 ${workDays} 天是社畜時間。工作只佔我人生的 ${workPercent}%。\n也許我該為自己活一點。\n🔗 https://diva-tarot.vercel.app`;
-      document.getElementById("copyText").innerText = copyText;
-      document.getElementById("copyText").style.display = "block";
-      document.getElementById("copyBtn").style.display = "inline-block";
-    }
-
-    function copyResult() {
-      const text = document.getElementById("copyText").innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        alert("已複製限動語錄 🎉");
-      });
-    }
   </script>
 </body>
 </html>
