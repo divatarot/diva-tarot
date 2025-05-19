@@ -1,133 +1,124 @@
+<!-- index.html - Diva官網首頁 升級版 -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>人生進度計算機 | Diva 療癒空間</title>
+  <title>Diva 療癒空間</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  .perspective {
+    perspective: 1000px;
+  }
+  .flip-card-inner {
+    transform-style: preserve-3d;
+    transition: transform 0.8s;
+  }
+  .flip-card-rotate {
+    transform: rotateY(180deg);
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+</style>
 </head>
-<body class="bg-gradient-to-br from-purple-50 via-white to-indigo-100 text-gray-800 min-h-screen">
-  <!-- 導覽列 -->
+<body class="bg-gradient-to-b from-blue-50 via-white to-blue-100 text-gray-800 font-sans">
   <header class="bg-white bg-opacity-70 sticky top-0 z-50 shadow-sm">
     <nav class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
       <div class="text-2xl font-bold text-indigo-700">Diva</div>
       <ul class="flex space-x-6 text-sm font-medium">
-        <li><a href="index.html" class="hover:text-blue-600">首頁</a></li>
+        <li><a href="index.html" class="text-blue-600 underline">首頁</a></li>
         <li><a href="service.html" class="hover:text-blue-600">服務</a></li>
         <li><a href="podcast.html" class="hover:text-blue-600">Podcast</a></li>
-        <li><a href="life.html" class="text-blue-600 underline">人生進度</a></li>
+        <li><a href="life.html" class="hover:text-blue-600">人生進度</a></li>
+        <li><a href="blog.html" class="hover:text-blue-600">部落格</a></li>
       </ul>
     </nav>
   </header>
 
-  <!-- 計算區塊 -->
-  <main class="max-w-3xl mx-auto px-6 py-12">
-    <h1 class="text-3xl font-bold text-center text-indigo-700 mb-6">🕒 人生進度計算機</h1>
-    <p class="text-center text-lg text-gray-700 mb-8">讓我們一起看看，你已經活了幾天，當了幾天社畜，還有多少日子能為自己而活。</p>
+  <main class="max-w-4xl mx-auto px-4 py-12 space-y-16">
+    <!-- 品牌主標語 -->
+    <section class="text-center">
+      <h1 class="text-4xl font-bold text-indigo-700 mb-4">你好，我是 Diva</h1>
+      <p class="text-lg text-gray-700 max-w-2xl mx-auto">我相信，每個人心中都有一片還沒被照亮的風景，而塔羅與聲音，是我用來陪你一起走進那片風景的方式。</p>
+    </section>
 
-    <div class="space-y-4">
-      <label class="block">🎂 出生日期
-        <input id="birthDate" type="date" class="w-full p-2 mt-1 border rounded">
-      </label>
-      <label class="block">🧑‍💼 開始上班日（可選填）
-        <input id="workDate" type="date" class="w-full p-2 mt-1 border rounded">
-      </label>
-      <label class="block">🔮 預估壽命（歲）
-        <input id="lifeExpect" type="number" value="85" class="w-full p-2 mt-1 border rounded">
-      </label>
-      <button onclick="calculateLife()" class="mt-4 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">開始計算</button>
-    </div>
-
-    <div id="lifeResult" class="mt-10 space-y-6 text-lg"></div>
-
-    <div class="mt-6 text-center">
-      <p class="text-indigo-600 font-medium">看到這些數字後，你最想為自己做的一件事是什麼呢？</p>
-      <div class="flex justify-center flex-wrap gap-4 mt-4">
-        <a href="service.html"><button class="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600">預約塔羅療癒</button></a>
-        <a href="podcast.html"><button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">聽 Diva Podcast</button></a>
-        <button onclick="copyResult()" id="copyBtn" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 hidden">複製分享語錄</button>
+    <!-- 今日祝福：互動卡片 -->
+    <section class="bg-white rounded-2xl shadow p-6 text-center">
+      <h2 class="text-2xl font-semibold text-blue-600 mb-4">💌 抽一張祝福卡</h2>
+      <div id="blessingCard" class="relative w-full max-w-md h-64 perspective mx-auto">
+        <div class="flip-card-inner w-full h-full absolute transition-transform duration-700 transform" id="cardInner">
+        <div class="absolute w-full h-full backface-hidden rounded-xl bg-cover bg-center" style="background-image: url('https://freeimage.host/i/3Pkjlz7');"></div>
+        <div class="absolute w-full h-full backface-hidden bg-yellow-50 rounded-xl p-6 shadow-inner transform rotate-y-180 flex items-center justify-center text-center text-xl" id="blessingText">
+        點擊下方按鈕，抽出今天的祝福卡 ✨
+        </div>
       </div>
-    </div>
+      <button onclick="newBlessing()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">抽一張祝福卡</button>
+    </section>
 
-    <div class="mt-6 flex justify-center">
-      <div id="copyText" class="bg-yellow-50 border-l-4 border-yellow-300 p-4 rounded shadow w-full max-w-md text-sm text-gray-700 font-mono" style="display:none;"></div>
-    </div>
+    <!-- 人生進度介紹區塊 -->
+    <section class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-2xl font-semibold text-indigo-600 mb-2">🧠 人生進度計算機</h2>
+      <p class="text-gray-700 mb-4">我們總以為人生還很長，直到有天意識到──原來社畜的日子，只是這段旅程的一小部分。這個工具，想幫你看見真正重要的時間。</p>
+      <a href="life.html">
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">開始計算 ➜</button>
+      </a>
+    </section>
 
-    <div class="mt-10 flex justify-center">
-      <canvas id="combinedPie" width="300" height="300"></canvas>
-    </div>
+    <!-- 部落格文章預覽區塊 -->
+    <section class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-2xl font-semibold text-indigo-600 mb-2">📓 最新分享文章</h2>
+      <p class="text-gray-700 mb-4">用文字記錄塔羅、靈性、療癒與人生裡那些微小但重要的片刻。這裡是我的心靈筆記本，也許，你會在其中找到一段屬於自己的回音。</p>
+      <a href="blog.html">
+        <button class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">閱讀最新文章 ➜</button>
+      </a>
+    </section>
+
+    <!-- Podcast 區塊簡介 -->
+    <section class="bg-white rounded-2xl shadow p-6">
+      <h2 class="text-2xl font-semibold text-indigo-600 mb-2">🎧 Diva Podcast</h2>
+      <p class="text-gray-700 mb-4">每一集都是一段心靈的對話與沉澱，讓你在忙碌的日子中找到一段溫柔的陪伴。</p>
+      <a href="podcast.html">
+        <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">前往收聽 ➜</button>
+      </a>
+    </section>
   </main>
 
   <footer class="text-center text-sm text-gray-500 py-6">
     &copy; 2025 Diva Healing. All rights reserved.
   </footer>
 
-  <!-- Script -->
+  <!-- Blessing Script -->
   <script>
-    let pieChartInstance;
-    function calculateLife() {
-      const birth = new Date(document.getElementById("birthDate").value);
-      const work = new Date(document.getElementById("workDate").value);
-      const expect = parseInt(document.getElementById("lifeExpect").value);
-      const today = new Date();
+    const blessings = [
+      "你已經做得很好了，別太苛責自己。",
+      "慢慢來也沒關係，你正在走在屬於你的節奏裡。",
+      "這世界很吵，但你的心值得安靜地被聽見。",
+      "你不是一個人，我在這裡陪你。",
+      "別忘了，照顧自己也是一種溫柔的勇氣。",
+      "即使什麼都不做，也是一種選擇。",
+      "你不是太敏感，是世界太粗糙。",
+      "每一段卡關的時期，都是蛻變的起點。",
+      "請相信，你的努力，未來會知道。",
+      "你活著，本身就是一種光。✨"
+    ];
 
-      if (!birth || isNaN(expect)) return;
-
-      const msDay = 1000 * 60 * 60 * 24;
-      const daysLived = Math.floor((today - birth) / msDay);
-      const end = new Date(birth.getFullYear() + expect, birth.getMonth(), birth.getDate());
-      const daysLeft = Math.floor((end - today) / msDay);
-      const totalDays = daysLived + daysLeft;
-      const workDays = work ? Math.floor((today - work) / msDay) : 0;
-      const freeDays = daysLived - workDays;
-
-      document.getElementById("lifeResult").innerHTML = `
-        <p>你已經登入人生 <strong>${daysLived}</strong> 天</p>
-        <p>預估還可以活 <strong>${daysLeft}</strong> 天</p>
-        <p>你當社畜了 <strong>${workDays}</strong> 天</p>
-        <p>自由活著的日子有 <strong>${freeDays}</strong> 天</p>
-        <p>整體人生總共 <strong>${totalDays}</strong> 天，其中只有 <strong>${workDays}</strong> 天是社畜人生</p>
-        <p>工作佔你人生的約 <strong>${((workDays / totalDays) * 100).toFixed(1)}%</strong></p>
-      `;
-
-      const copyText = `我已經活了 ${daysLived} 天，其中 ${workDays} 天是社畜時間。\n工作只佔我人生的 ${((workDays / totalDays) * 100).toFixed(1)}%。\n也許我該為自己活一點。\n🔗 https://diva-tarot.vercel.app/life.html`;
-      document.getElementById("copyText").innerText = copyText;
-      document.getElementById("copyText").style.display = "block";
-      document.getElementById("copyBtn").style.display = "inline-block";
-
-      const data = {
-        labels: ['社畜天數', '自由人生（已活）', '未來日子'],
-        datasets: [{
-          data: [workDays, freeDays, daysLeft],
-          backgroundColor: ['#60a5fa', '#a5b4fc', '#e0e7ff']
-        }]
-      };
-
-      const ctx = document.getElementById("combinedPie").getContext("2d");
-      if (pieChartInstance) pieChartInstance.destroy();
-      pieChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data,
-        options: {
-          plugins: {
-            title: {
-              display: true,
-              text: '你的人生時間分布圖',
-              font: { size: 18 }
-            },
-            legend: { position: 'bottom' }
-          }
-        }
-      });
+    function newBlessing() {
+      const card = document.getElementById("cardInner");
+      const text = blessings[Math.floor(Math.random() * blessings.length)];
+      card.classList.add("flip-card-rotate");
+      setTimeout(() => {
+        document.getElementById("blessingText").innerText = text;
+      }, 400);
+      setTimeout(() => {
+        card.classList.remove("flip-card-rotate");
+      }, 2000);
     }
 
-    function copyResult() {
-      const text = document.getElementById("copyText").innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        alert("已複製限動語錄 🎉");
-      });
-    }
+    window.onload = newBlessing;
   </script>
 </body>
 </html>
