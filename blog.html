@@ -26,8 +26,12 @@
       如果你也曾對生活感到迷惘、想尋找方向，也許這些文字能陪你一段路。
     </p>
 
-    <div class="space-y-6">
-      <!-- 未來可重複這區塊 -->
+<div id="postList" class="space-y-6">
+  <noscript>
+    <p class="text-center text-gray-500">請開啟 JavaScript 以顯示文章列表。</p>
+  </noscript>
+</div>
+    <!-- 未來可重複這區塊 -->
       <a href="blog-post-1.html" class="block bg-white rounded-xl shadow p-5 hover:bg-indigo-50 transition">
   <h2 class="text-xl font-semibold text-indigo-700">✨ 當我學會跟情緒和解，生活開始變得溫柔了</h2>
   <p class="text-sm text-gray-600 mt-2">寫於 2025/05/19</p>
@@ -43,6 +47,20 @@
       <!-- 可加更多文章區塊 -->
     </div>
   </main>
+  <script>
+fetch('posts.json')
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById('postList');
+    container.innerHTML = data.map(post => `
+      <a href="${post.link}" class="block bg-white rounded-xl shadow p-5 hover:bg-indigo-50 transition">
+        <h2 class="text-xl font-semibold text-indigo-700">${post.title}</h2>
+        <p class="text-sm text-gray-600 mt-2">寫於 ${post.date}</p>
+        <p class="text-gray-700 mt-2">${post.summary}</p>
+      </a>
+    `).join('');
+  });
+</script>
 
   <footer class="text-center text-sm text-gray-500 py-6">
     &copy; 2025 Diva Healing. All rights reserved.
