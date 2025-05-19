@@ -48,12 +48,18 @@
 
     <!-- 今日祝福：互動卡片 -->
     <section class="bg-white rounded-2xl shadow p-6 text-center">
-      <h2 class="text-2xl font-semibold text-blue-600 mb-4">💌 抽一張祝福卡</h2>
-      <div id="blessingCard" class="relative w-full max-w-md h-auto mx-auto">
-  <img src="https://freeimage.host/i/3Pkjlz7" alt="Blessing Card" class="rounded-xl shadow w-full h-auto">
-</div>
-<button onclick="newBlessing()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">抽一張祝福卡</button>
-    </section>
+  <h2 class="text-2xl font-semibold text-blue-600 mb-4">💌 抽一張祝福卡</h2>
+
+  <!-- 卡片圖片 -->
+  <img src="https://iili.io/3Pkjlz7.md.png" alt="Blessing Card" class="rounded-xl shadow w-full max-w-sm mx-auto mb-4">
+
+  <!-- 顯示祝福語 -->
+  <p id="blessingText" class="text-lg text-gray-700 h-16 flex items-center justify-center transition-all duration-300"></p>
+
+  <!-- 按鈕 -->
+  <button onclick="newBlessing()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">抽一張祝福卡</button>
+</section>
+
 
     <!-- 人生進度介紹區塊 -->
     <section class="bg-white rounded-2xl shadow p-6">
@@ -116,5 +122,13 @@
 
     window.onload = newBlessing;
   </script>
+  function newBlessing() {
+  const text = blessings[Math.floor(Math.random() * blessings.length)];
+  const display = document.getElementById("blessingText");
+  if (display) {
+    display.innerText = text;
+  }
+}
+
 </body>
 </html>
