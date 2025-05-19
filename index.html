@@ -49,14 +49,10 @@
     <!-- 今日祝福：互動卡片 -->
     <section class="bg-white rounded-2xl shadow p-6 text-center">
       <h2 class="text-2xl font-semibold text-blue-600 mb-4">💌 抽一張祝福卡</h2>
-      <div id="blessingCard" class="relative w-full max-w-md h-64 perspective mx-auto">
-        <div class="flip-card-inner w-full h-full absolute transition-transform duration-700 transform" id="cardInner">
-        <div class="absolute w-full h-full backface-hidden rounded-xl bg-cover bg-center" style="background-image: url('https://freeimage.host/i/3Pkjlz7');"></div>
-        <div class="absolute w-full h-full backface-hidden bg-yellow-50 rounded-xl p-6 shadow-inner transform rotate-y-180 flex items-center justify-center text-center text-xl" id="blessingText">
-        點擊下方按鈕，抽出今天的祝福卡 ✨
-        </div>
-      </div>
-      <button onclick="newBlessing()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">抽一張祝福卡</button>
+      <div id="blessingCard" class="relative w-full max-w-md h-auto mx-auto">
+  <img src="https://freeimage.host/i/3Pkjlz7" alt="Blessing Card" class="rounded-xl shadow w-full h-auto">
+</div>
+<button onclick="newBlessing()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">抽一張祝福卡</button>
     </section>
 
     <!-- 人生進度介紹區塊 -->
