@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Diva療癒空間</title>
+  <title>Diva 療癒空間</title>
   <style>
     body {
       background: #eaf4fb;
@@ -13,28 +13,64 @@
       padding: 2rem;
       text-align: center;
     }
-    h1 {
+    h1, h2 {
       color: #305f94;
     }
     .section {
       background: #fff;
+      margin: 2rem auto;
       padding: 1.5rem;
-      margin: 1rem auto;
       border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-      max-width: 600px;
+      max-width: 700px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      text-align: left;
     }
-    .section h2 {
-      color: #305f94;
+    .progress-bar {
+      height: 20px;
+      border-radius: 10px;
+      background: #d3e0ea;
+      margin: 0.5rem 0;
     }
-    .footer {
-      margin-top: 3rem;
+    .progress-fill {
+      height: 100%;
+      background: #305f94;
+      border-radius: 10px;
+      text-align: right;
+      padding-right: 8px;
+      color: white;
+      font-size: 0.8rem;
+      line-height: 20px;
+    }
+    label, input {
+      display: block;
+      margin: 0.5rem auto;
+      font-size: 1rem;
+    }
+    input {
+      padding: 0.5rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      background: #305f94;
+      color: white;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .quote, .result-line {
+      margin: 1rem 0;
+      font-weight: bold;
+    }
+    .copy-box {
+      margin-top: 1rem;
+      background: #f6f6f6;
+      padding: 0.8rem;
+      border-radius: 8px;
       font-size: 0.9rem;
-      color: #7f8c8d;
-    }
-    a {
-      color: #305f94;
-      text-decoration: none;
+      word-break: break-word;
     }
   </style>
 </head>
@@ -42,55 +78,146 @@
   <h1>我是陪伴你的 Diva</h1>
   <p>這裡是一個讓你在快節奏的生活中，找到片刻寧靜的地方。</p>
 
-  <div class="section" id="lifeStats">
-    <h2>人生計算中...</h2>
-  </div>
-
-  <div class="section" id="blessing">
-    <h2>今日祝福</h2>
+  <div class="section">
+    <h2>💌 今日的祝福</h2>
     <p id="blessingText">載入中...</p>
   </div>
 
-  <div class="footer">
-    想預約療癒占卜？<br />
-    <a href="https://your-form-link.com" target="_blank">點我填寫表單</a>
+  <div class="section">
+    <h2>🎧 Podcast 收聽</h2>
+    <iframe title="Firstory" src="https://open.firstory.me/user/jpblackdog/platforms" height="500" width="100%" frameborder="0" scrolling="no"></iframe>
+  </div>
+
+  <div class="section">
+    <h2>🔮 Diva 塔羅療癒</h2>
+    <p>我是Diva，一位沈浸在塔羅與療癒能量中的女子。我相信塔羅不僅是預測工具，更是連結內在智慧的橋樑。每一次的占卜都是一次能量交流，我將陪你看見自己的答案，釋放內在的阻礙。</p>
+
+    <ul>
+      <li><strong>陪伴療癒：</strong>用溫柔的方式陪你看見內在的聲音與力量。</li>
+      <li><strong>塔羅交流：</strong>幫你解析牌面，釐清困惑，找出方向。</li>
+      <li><strong>內在智慧：</strong>連結內在指引，找到真正屬於你的答案。</li>
+    </ul>
+
+    <h3>📨 占卜方式</h3>
+    <ul>
+      <li><strong>文字塔羅占卜：</strong>適合思考型靈魂，一次一題，提供完整文字解讀。</li>
+      <li><strong>語音塔羅解讀：</strong>透過聲音療癒能量，讓你一邊聽一邊理解。</li>
+    </ul>
+
+    <h3>🌟 特別服務</h3>
+    <ul>
+      <li>占卜結果詳細解讀</li>
+      <li>天使祝福</li>
+      <li>高我連結：幫助你收到內在訊息</li>
+    </ul>
+
+    <h3>📌 占卜須知</h3>
+    <ul>
+      <li>一次僅問一個問題（可深入）</li>
+      <li>回覆時間：24～48小時內</li>
+      <li>保密制度保障你的隱私</li>
+      <li>採隨喜制：依你感受到的幫助給予回饋</li>
+    </ul>
+
+    <p>謝謝你想來找我聊聊 🌿<br>讓我們一起連結內在的智慧吧。</p>
+    <p><strong>➕ LINE 好友抽卡：</strong><br><a href=\"https://line.me/R/ti/p/@258ruoqh?oat__id=5358338\" target=\"_blank\">點我加好友</a></p>
+  </div>
+  <div class="section">
+    <h2>🕒 人生進度計算機</h2>
+    <label>你出生的日期</label>
+    <input type="date" id="birthDate" />
+
+    <label>你開始上班的日期</label>
+    <input type="date" id="workDate" />
+
+    <label>你預估的壽命（幾歲）</label>
+    <input type="number" id="lifeExpect" value="85" />
+
+    <button onclick="calculateLife()">開始計算</button>
+
+    <div id="lifeResult"></div>
+    <div class="copy-box" id="copyText" style="display:none;"></div>
+    <button onclick="copyResult()" id="copyBtn" style="display:none;">複製限動語錄</button>
+  </div>
+
+  <div class="section">
+    <h2>📅 預約療癒占卜</h2>
+    <p>如果你想得到一段溫柔的陪伴與引導，歡迎填寫表單或私訊我。</p>
+    <a href="https://your-form-link.com" target="_blank">
+      <button>前往預約</button>
+    </a>
   </div>
 
   <script>
-    const birthDate = new Date("1996-08-20");
-    const workStart = new Date("2018-07-01");
-    const resignDate = new Date("2025-04-30");
-    const lifeExpectancy = 85;
-
-    const today = new Date();
-    const oneDay = 1000 * 60 * 60 * 24;
-
-    const daysLived = Math.floor((today - birthDate) / oneDay);
-    const daysWorked = Math.floor((resignDate - workStart) / oneDay);
-    const daysSinceQuit = today > resignDate ? Math.floor((today - resignDate) / oneDay) : 0;
-    const expectedEnd = new Date(birthDate.getFullYear() + lifeExpectancy, birthDate.getMonth(), birthDate.getDate());
-    const daysLeft = Math.floor((expectedEnd - today) / oneDay);
-
-    document.getElementById("lifeStats").innerHTML = `
-      <h2>屬於你的人生數據</h2>
-      <p>我已經活了 <strong>${daysLived}</strong> 天</p>
-      <p>當社畜了 <strong>${daysWorked}</strong> 天</p>
-      <p>離職後過了 <strong>${daysSinceQuit}</strong> 天</p>
-      <p>預估還剩下 <strong>${daysLeft}</strong> 天可以活</p>
-    `;
-
     const blessings = [
-      "你已經做得很好了，別太苛責自己。",
-      "慢慢來也沒關係，你正在走在屬於你的節奏裡。",
-      "這世界很吵，但你的心值得安靜地被聽見。",
-      "別忘了，照顧自己也是一種溫柔的勇氣。",
-      "今天的你，也值得被好好擁抱。",
-      "所有情緒都是訊號，不是麻煩。",
-      "即使什麼都不做，也是一種選擇。",
-      "你不是一個人，我在這裡陪你。"
+      \"你已經做得很好了，別太苛責自己。\",
+      \"慢慢來也沒關係，你正在走在屬於你的節奏裡。\",
+      \"這世界很吵，但你的心值得安靜地被聽見。\",
+      \"別忘了，照顧自己也是一種溫柔的勇氣。\",
+      \"今天的你，也值得被好好擁抱。\",
+      \"所有情緒都是訊號，不是麻煩。\",
+      \"即使什麼都不做，也是一種選擇。\",
+      \"你不是一個人，我在這裡陪你。\",
+      \"願你在不被理解的時候，依然溫柔地活著。\",
+      \"別急著趕路，先照顧好現在的自己。\",
+      \"你的呼吸，就是你存在的證明。\",
+      \"留一點空白，讓靈魂追上身體。\",
+      \"你的慢，不是錯，只是節奏不同。\",
+      \"不需要被看懂，只要被善待就好。\",
+      \"你值得擁有安靜與喜歡的生活。\",
+      \"累了就停下來，這也是一種勇敢。\",
+      \"感到混亂，是改變前的訊號。\",
+      \"那些走過的黑暗，正在變成你的光。\",
+      \"你的心比你想的還要溫柔。\",
+      \"情緒不是敵人，是你的一部分。\",
+      \"你走的每一步，宇宙都知道。\",
+      \"世界會慢慢變好，但你可以先變溫柔。\",
+      \"當你相信自己值得，整個宇宙都會配合你。\",
+      \"你不是太敏感，是世界太粗糙。\",
+      \"在這個快轉的世界裡，謝謝你願意慢下來。\",
+      \"你今天過得辛苦了，謝謝你還在撐著。\",
+      \"請相信，你的努力，未來會知道。\",
+      \"每一段卡關的時期，都是蛻變的起點。\",
+      \"即使什麼都不做，也值得被愛。\",
+      \"你活著，本身就是一種光。✨\"
     ];
-    const random = blessings[Math.floor(Math.random() * blessings.length)];
-    document.getElementById("blessingText").innerText = random;
-  </script>
-</body>
-</html>
+    document.getElementById(\"blessingText\").innerText = blessings[Math.floor(Math.random() * blessings.length)];
+
+    function calculateLife() {
+      const birth = new Date(document.getElementById(\"birthDate\").value);
+      const work = new Date(document.getElementById(\"workDate\").value);
+      const expect = parseInt(document.getElementById(\"lifeExpect\").value);
+      const today = new Date();
+
+      if (!birth || !expect) return;
+
+      const msDay = 1000 * 60 * 60 * 24;
+      const daysLived = Math.floor((today - birth) / msDay);
+      const daysLeft = Math.floor((new Date(birth.getFullYear() + expect, birth.getMonth(), birth.getDate()) - today) / msDay);
+      const workDays = work ? Math.floor((today - work) / msDay) : 0;
+      const workPercent = ((workDays / (daysLived + daysLeft)) * 100).toFixed(1);
+      const lifePercent = ((daysLived / (daysLived + daysLeft)) * 100).toFixed(1);
+
+      const html = \`
+        <div class='quote'>你已經登入人生 \${daysLived} 天</div>
+        <div class='quote'>預估還可以活 \${daysLeft} 天</div>
+        <div class='quote'>你當社畜了 \${workDays} 天</div>
+        <div class='quote'>工作佔你人生的約 \${workPercent}%</div>
+
+        <h4>🧠 給你的提醒</h4>
+        <p>工作只是人生的一部分，你還有更多值得去愛的、去完成的。</p>
+        <div class='progress-bar'><div class='progress-fill' style='width:\${lifePercent}%;'>人生 \${lifePercent}%</div></div>
+        <div class='progress-bar'><div class='progress-fill' style='width:\${workPercent}%; background:#8499c7;'>社畜 \${workPercent}%</div></div>
+      \`;
+
+      document.getElementById(\"lifeResult\").innerHTML = html;
+
+      const copyText = \`我在這個世界上已經活了 \${daysLived} 天，\\n其中 \${workDays} 天是社畜時間，\\n其實工作只佔我人生的 \${workPercent}%...\\n原來，我還能做很多喜歡的事。\\n🔗 https://diva-tarot.vercel.app\`;
+      document.getElementById(\"copyText\").innerText = copyText;
+      document.getElementById(\"copyText\").style.display = \"block\";
+      document.getElementById(\"copyBtn\").style.display = \"inline-block\";
+    }
+
+    function copyResult() {
+      const text = document.getElementById(\"copyText\").innerText;
+      navigator.clipboard.writeText(text).then(() =>
