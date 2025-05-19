@@ -1,29 +1,11 @@
-<!-- index.html - Diva官網首頁 升級版 -->
+<!-- 完整版 index.html｜Diva 療癒空間首頁 -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Diva 療癒空間</title>
   <script src="https://cdn.tailwindcss.com"></script>
-<style>
-  .perspective {
-    perspective: 1000px;
-  }
-  .flip-card-inner {
-    transform-style: preserve-3d;
-    transition: transform 0.8s;
-  }
-  .flip-card-rotate {
-    transform: rotateY(180deg);
-  }
-  .backface-hidden {
-    backface-visibility: hidden;
-  }
-  .rotate-y-180 {
-    transform: rotateY(180deg);
-  }
-</style>
 </head>
 <body class="bg-gradient-to-b from-blue-50 via-white to-blue-100 text-gray-800 font-sans">
   <header class="bg-white bg-opacity-70 sticky top-0 z-50 shadow-sm">
@@ -40,28 +22,22 @@
   </header>
 
   <main class="max-w-4xl mx-auto px-4 py-12 space-y-16">
-    <!-- 品牌主標語 -->
+
+    <!-- 品牌宣言 -->
     <section class="text-center">
       <h1 class="text-4xl font-bold text-indigo-700 mb-4">你好，我是 Diva</h1>
       <p class="text-lg text-gray-700 max-w-2xl mx-auto">我相信，每個人心中都有一片還沒被照亮的風景，而塔羅與聲音，是我用來陪你一起走進那片風景的方式。</p>
     </section>
 
-    <!-- 今日祝福：互動卡片 -->
+    <!-- 祝福卡區塊 -->
     <section class="bg-white rounded-2xl shadow p-6 text-center">
-  <h2 class="text-2xl font-semibold text-blue-600 mb-4">💌 抽一張祝福卡</h2>
+      <h2 class="text-2xl font-semibold text-blue-600 mb-4">💌 抽一張祝福卡</h2>
+      <img src="https://iili.io/3Pkjlz7.md.png" alt="Blessing Card" class="rounded-xl shadow w-full max-w-sm mx-auto mb-4">
+      <p id="blessingText" class="text-lg text-gray-700 h-16 flex items-center justify-center transition-all duration-300"></p>
+      <button onclick="newBlessing()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">抽一張祝福卡</button>
+    </section>
 
-  <!-- 卡片圖片 -->
-  <img src="https://iili.io/3Pkjlz7.md.png" alt="Blessing Card" class="rounded-xl shadow w-full max-w-sm mx-auto mb-4">
-
-  <!-- 顯示祝福語 -->
-  <p id="blessingText" class="text-lg text-gray-700 h-16 flex items-center justify-center transition-all duration-300"></p>
-
-  <!-- 按鈕 -->
-  <button onclick="newBlessing()" class="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">抽一張祝福卡</button>
-</section>
-
-
-    <!-- 人生進度介紹區塊 -->
+    <!-- 人生進度計算機預覽 -->
     <section class="bg-white rounded-2xl shadow p-6">
       <h2 class="text-2xl font-semibold text-indigo-600 mb-2">🧠 人生進度計算機</h2>
       <p class="text-gray-700 mb-4">我們總以為人生還很長，直到有天意識到──原來社畜的日子，只是這段旅程的一小部分。這個工具，想幫你看見真正重要的時間。</p>
@@ -70,7 +46,7 @@
       </a>
     </section>
 
-    <!-- 部落格文章預覽區塊 -->
+    <!-- 部落格預覽 -->
     <section class="bg-white rounded-2xl shadow p-6">
       <h2 class="text-2xl font-semibold text-indigo-600 mb-2">📓 最新分享文章</h2>
       <p class="text-gray-700 mb-4">用文字記錄塔羅、靈性、療癒與人生裡那些微小但重要的片刻。這裡是我的心靈筆記本，也許，你會在其中找到一段屬於自己的回音。</p>
@@ -79,7 +55,7 @@
       </a>
     </section>
 
-    <!-- Podcast 區塊簡介 -->
+    <!-- Podcast 預覽 -->
     <section class="bg-white rounded-2xl shadow p-6">
       <h2 class="text-2xl font-semibold text-indigo-600 mb-2">🎧 Diva Podcast</h2>
       <p class="text-gray-700 mb-4">每一集都是一段心靈的對話與沉澱，讓你在忙碌的日子中找到一段溫柔的陪伴。</p>
@@ -93,7 +69,7 @@
     &copy; 2025 Diva Healing. All rights reserved.
   </footer>
 
-  <!-- Blessing Script -->
+  <!-- JS for 祝福語 -->
   <script>
     const blessings = [
       "你已經做得很好了，別太苛責自己。",
@@ -109,26 +85,14 @@
     ];
 
     function newBlessing() {
-      const card = document.getElementById("cardInner");
       const text = blessings[Math.floor(Math.random() * blessings.length)];
-      card.classList.add("flip-card-rotate");
-      setTimeout(() => {
-        document.getElementById("blessingText").innerText = text;
-      }, 400);
-      setTimeout(() => {
-        card.classList.remove("flip-card-rotate");
-      }, 2000);
+      const display = document.getElementById("blessingText");
+      if (display) {
+        display.innerText = text;
+      }
     }
 
     window.onload = newBlessing;
   </script>
-  function newBlessing() {
-  const text = blessings[Math.floor(Math.random() * blessings.length)];
-  const display = document.getElementById("blessingText");
-  if (display) {
-    display.innerText = text;
-  }
-}
-
 </body>
 </html>
