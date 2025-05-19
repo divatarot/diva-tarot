@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>人生進度計算機 | Diva 療癒空間</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2/dist/chartjs-plugin-datalabels.min.js"></script>
+<script>Chart.register(ChartDataLabels);</script>
+</head>
+<body class="bg-gradient-to-br from-purple-50 via-white to-indigo-100 text-gray-800 min-h-screen">
+  <main class="max-w-3xl mx-auto px-6 py-12">
+    <h1 class="text-3xl font-bold text-center text-indigo-700 mb-8">🧠 人生進度計算機</h1>
+    <form onsubmit="event.preventDefault(); calculateLife();" class="space-y-4 mb-8">
+      <div>
+        <label for="birthdate" class="block mb-1 font-medium">你的生日：</label>
+        <input type="date" id="birthdate" class="w-full px-4 py-2 border rounded" required>
+      </div>
+      <div>
+        <label for="workyears" class="block mb-1 font-medium">你大約工作了幾年？（可估算）</label>
+<input type="number" id="workyears" class="w-full px-4 py-2 border rounded" required>
+      </div>
+      <div>
+        <label for="lifeExpectancy" class="block mb-1 font-medium">你預期壽命？（預設 85 歲）</label>
+        <input type="number" id="lifeExpectancy" class="w-full px-4 py-2 border rounded" value="85">
+      </div>
+      <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">計算我的人生進度</button>
+    </form>
+
+    <canvas id="lifeChart" class="mx-auto mb-8" width="320" height="320"></canvas>
+    <div id="lifeResult" class="text-center space-y-2 text-lg"></div>
+  </main>
+
+  <script>
+    let chart;
+    function calculateLife() {
+      const birthdate = new Date(document.getElementById('birthdate').value);
+      const today = new Date();
+      const lifeExpectancy = parseInt(document.getElementById('lifeExpectancy').value || '85');
+      const workyears = parseInt(document.getElementById('workyears').value);
+      const workdays = Math.floor(workyears * 365.25);
+      const livedDays = Math.floor((today - birthdate) / (1000 * 60 * 60 * 24));
+      const totalDays = Math.floor(lifeExpectancy * 365.25);
+      const daysLeft = totalDays - livedDays;
+      const freeDays = livedDays - workdays;
+
+      document.getElementById('lifeResult').innerHTML = `
+        <p>你已經活了 <strong>${livedDays}</strong> 天。</p>
+        <p>其中 <strong>${workdays}</strong> 天是社畜日子，<strong>${freeDays}</strong> 天是自由人生。</p>
+        <p>你還有大約 <strong>${daysLeft}</strong> 天可以使用。</p>
+        <p>整體來說，你已經走過 <strong>${((livedDays / totalDays) * 100).toFixed(1)}%</strong> 的人生。</p>
+      `;
+
+      const ctx = document.getElementById('lifeChart').getContext('2d');
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['社畜', '自由人生（已活）', '未來日子'],
+          datasets: [{
+            data: [workdays, freeDays, daysLeft],
+            backgroundColor: ['#60a5fa', '#a5b4fc', '#e0e7ff'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom'
+            },
+            datalabels: {
+              color: '#444',
+              font: {
+                weight: 'bold'
+              },
+              formatter: (value, context) => {
+                const total = context.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return percentage + '%';
+              }
+            },
+            title: {
+              display: true,
+              text: '你的人生時間分布圖',
+              font: { size: 18 }
+            }
+          }
+        },
+        plugins: [ChartDataLabels]
+      });
+    }
+  </script>
+</body>
+</html>
