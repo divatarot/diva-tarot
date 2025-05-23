@@ -64,7 +64,9 @@
 <footer class="text-center text-sm text-gray-500 py-6">
   &copy; 2025 Diva Healing. All rights reserved.
 </footer>
+  
 <script>
+
   const lifePathDescriptions = {
     1: "你是天生的開創者 💡，具有領導力與行動力，勇於走自己的路。",
     2: "你是天生的傾聽者 🤝，富有同理心，擅長建立情感連結。",
@@ -188,7 +190,7 @@
 
     document.getElementById("drawResult").classList.remove("hidden");
     document.getElementById("cardName").innerText = `🎴 你抽到的天賦加強牌是：「${drawnCard.name}」`;
-    document.getElementById("cardMeaning").innerText = `💬 ${drawnCard.meaning}`;
+    document.getElementById("cardMeaning").innerText = `💬 ${drawnCard.message}\n🌟 ${drawnCard.reminder}`;
   }
 
   function showFinalMessage() {
