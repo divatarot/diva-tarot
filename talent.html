@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Diva 天賦塔羅計算器</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-b from-blue-50 via-white to-indigo-100 text-gray-800 font-sans">
+
+<header class="bg-white bg-opacity-70 sticky top-0 z-50 shadow-sm">
+  <nav class="max-w-6xl mx-auto flex justify-between items-center px-6 py-4">
+    <div class="text-2xl font-bold text-indigo-700">Diva 寧靜時刻｜塔羅實習室</div>
+    <ul class="flex space-x-6 text-sm font-medium">
+      <li><a href="index.html" class="hover:text-blue-600">首頁</a></li>
+      <li><a href="service.html" class="hover:text-blue-600">服務</a></li>
+      <li><a href="podcast.html" class="hover:text-blue-600">Podcast</a></li>
+      <li><a href="life.html" class="hover:text-blue-600">人生進度</a></li>
+      <li><a href="blog.html" class="hover:text-blue-600">部落格</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="max-w-xl mx-auto px-6 py-12 space-y-8">
+  <h1 class="text-3xl font-bold text-center text-indigo-700">🔮 Diva 的靈魂天賦解析</h1>
+  <p class="text-center text-gray-700">請輸入你的生日，讓我為你揭示潛藏的天賦 🌙</p>
+
+  <!-- 輸入生日 -->
+  <div class="bg-white bg-opacity-80 rounded-2xl shadow-xl p-6 space-y-4">
+    <label class="block text-gray-600 font-medium">輸入生日（西元年/月/日）：</label>
+    <div class="flex space-x-2">
+      <input id="year" type="number" placeholder="年" class="w-1/3 px-3 py-2 border rounded">
+      <input id="month" type="number" placeholder="月" class="w-1/3 px-3 py-2 border rounded">
+      <input id="day" type="number" placeholder="日" class="w-1/3 px-3 py-2 border rounded">
+    </div>
+    <button onclick="calculateLifePath()" class="w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700">✨ 開始解析</button>
+  </div>
+
+  <!-- 顯示生命靈數結果 -->
+  <div id="lifeInfo" class="hidden bg-white rounded-2xl shadow p-5 space-y-3">
+    <p id="lifePathText" class="text-lg font-semibold text-indigo-700"></p>
+    <p id="lifeDescription" class="text-gray-700"></p>
+    <button onclick="drawTarotCard()" id="drawButton" class="mt-4 bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">🎴 抽出你的天賦加強牌</button>
+  </div>
+
+  <!-- 抽牌結果 -->
+  <div id="drawResult" class="hidden bg-white rounded-xl shadow p-5 space-y-3">
+    <p id="cardName" class="text-lg font-semibold text-blue-700"></p>
+    <p id="cardMeaning" class="text-gray-700"></p>
+    <button onclick="showFinalMessage()" class="mt-4 bg-indigo-600 text-white py-2 px-4 rounded hover:bg-indigo-700">💌 查看完整天賦解析</button>
+  </div>
+
+  <!-- 最終完整聊天訊息 -->
+  <div id="finalMessage" class="hidden bg-white rounded-xl shadow p-5 space-y-4 text-sm">
+    <div id="chatBox" class="space-y-3">
+      <!-- JS 打字訊息會插入這裡 -->
+    </div>
+    <div class="text-center mt-4">
+      <a href="https://line.me/R/ti/p/@258ruoqh" target="_blank" class="inline-block bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600">🌸 想更深入了解？歡迎找 Diva 占卜</a>
+    </div>
+  </div>
+</main>
+
+<footer class="text-center text-sm text-gray-500 py-6">
+  &copy; 2025 Diva Healing. All rights reserved.
+</footer>
+<script>
+  const lifePathDescriptions = {
+    1: "你是天生的開創者 💡，具有領導力與行動力，勇於走自己的路。",
+    2: "你是天生的傾聽者 🤝，富有同理心，擅長建立情感連結。",
+    3: "你是充滿創意的靈魂 🎨，擅長表達、藝術與感染他人。",
+    4: "你是穩定的築夢者 🧱，腳踏實地、有責任感，是值得信賴的人。",
+    5: "你是變化的旅人 🌍，渴望自由、擅長適應，適合走在前線探索世界。",
+    6: "你是溫柔的守護者 🌸，重視和諧，願意為愛付出。",
+    7: "你是內在的探索者 🧘‍♀️，擁有深度思考與靈性天賦。",
+    8: "你是行動的實踐者 💼，擅長整合資源、追求成就與影響力。",
+    9: "你是靈魂的療癒者 🌈，富有愛與智慧，願意為世界帶來善與光。"
+  };
+
+  const tarotCards = [
+    { name: "愚者 The Fool", meaning: "代表純真與新開始，提醒你保持信任並踏上自己的道路。" },
+    { name: "魔術師 The Magician", meaning: "你擁有把想法轉為現實的能力，只要相信自己便能創造奇蹟。" },
+    { name: "女教皇 The High Priestess", meaning: "提醒你相信直覺，答案藏在你的內在深處。" },
+    { name: "皇后 The Empress", meaning: "展現你的愛與創造力，你正在孕育一段豐盛的成長。" },
+    { name: "皇帝 The Emperor", meaning: "你已具備穩定的力量，是時候建立你的王國與規則。" },
+    { name: "戀人 The Lovers", meaning: "愛與選擇的能量提醒你，聆聽內心，做出靈魂的決定。" },
+    { name: "力量 Strength", meaning: "溫柔就是你的力量，真正的勇氣來自內在的穩定與信任。" },
+    { name: "隱者 The Hermit", meaning: "你正在經歷內在探索，安靜是一種通往智慧的方式。" },
+    { name: "太陽 The Sun", meaning: "你的靈魂渴望綻放，別害怕閃耀自己的光。" },
+    { name: "審判 Judgement", meaning: "你正走在覺醒之路上，願你勇敢回應內在的召喚。" }
+  ];
+
+  let selectedLifeNum = 0;
+  let drawnCard = null;
+
+  function calculateLifePath() {
+    const y = document.getElementById("year").value;
+    const m = document.getElementById("month").value;
+    const d = document.getElementById("day").value;
+
+    if (!y || !m || !d) {
+      alert("請完整輸入生日！");
+      return;
+    }
+
+    const digits = (y + m + d).split('').map(Number);
+    let total = digits.reduce((a, b) => a + b, 0);
+    while (total > 9) {
+      total = total.toString().split('').reduce((a, b) => a + Number(b), 0);
+    }
+
+    selectedLifeNum = total;
+    document.getElementById("lifeInfo").classList.remove("hidden");
+    document.getElementById("lifePathText").innerText = `🔢 你的生命靈數是 ${selectedLifeNum}`;
+    document.getElementById("lifeDescription").innerText = lifePathDescriptions[selectedLifeNum];
+  }
+
+  function drawTarotCard() {
+    const randomIndex = Math.floor(Math.random() * tarotCards.length);
+    drawnCard = tarotCards[randomIndex];
+
+    document.getElementById("drawResult").classList.remove("hidden");
+    document.getElementById("cardName").innerText = `🎴 你抽到的天賦加強牌是：「${drawnCard.name}」`;
+    document.getElementById("cardMeaning").innerText = `💬 ${drawnCard.meaning}`;
+  }
+
+  function showFinalMessage() {
+    document.getElementById("finalMessage").classList.remove("hidden");
+    const box = document.getElementById("chatBox");
+    box.innerHTML = ""; // 清空
+
+    const messages = [
+      `🌙 Diva 說：你的生命靈數是 ${selectedLifeNum}，這象徵著 ${lifePathDescriptions[selectedLifeNum].replace("你是", "你擁有")}。`,
+      `🃏 你今天抽到的加強牌是「${drawnCard.name}」，這張牌提醒你：${drawnCard.meaning}`,
+      `✨ 綜合來看，你是一位具有靈性與潛力的靈魂，在這個階段，宇宙要你記得：你的內在力量、創造力與溫柔，將引導你走向屬於自己的道路。`,
+      `💌 想更深入探索自己的天賦嗎？我願意陪你一起聊聊 🌿`
+    ];
+
+    let i = 0;
+    function typeMessage() {
+      if (i < messages.length) {
+        const p = document.createElement("p");
+        p.innerText = messages[i];
+        box.appendChild(p);
+        i++;
+        setTimeout(typeMessage, 1500);
+      }
+    }
+    typeMessage();
+  }
+</script>
