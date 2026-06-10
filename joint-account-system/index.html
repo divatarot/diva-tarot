@@ -1,0 +1,1688 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>共同帳戶收支系統</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f4;
+      --surface: #ffffff;
+      --surface-2: #eef4f1;
+      --ink: #1f2933;
+      --muted: #64716b;
+      --line: #dce3df;
+      --teal: #16786f;
+      --teal-2: #0f5f58;
+      --coral: #d35f4a;
+      --amber: #bf7d17;
+      --green: #24865a;
+      --shadow: 0 18px 55px rgba(34, 48, 42, .11);
+      --radius: 8px;
+      font-family: Inter, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+    }
+
+    .auth-screen {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background:
+        linear-gradient(rgba(22, 35, 31, .78), rgba(22, 35, 31, .78)),
+        url("https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1800&q=80") center / cover;
+    }
+
+    body:not(.auth-locked) .auth-screen {
+      display: none;
+    }
+
+    .auth-locked .app {
+      display: none;
+    }
+
+    .auth-card {
+      width: min(100%, 430px);
+      background: rgba(255, 255, 255, .96);
+      border: 1px solid rgba(255, 255, 255, .5);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .auth-card .brand {
+      color: var(--ink);
+      border-bottom-color: var(--line);
+      padding: 0 0 18px;
+      margin-bottom: 20px;
+    }
+
+    .auth-card .brand span {
+      color: var(--muted);
+    }
+
+    .auth-card h2 {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0;
+    }
+
+    .auth-card p {
+      margin: 8px 0 20px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .auth-error {
+      min-height: 22px;
+      margin: 10px 0 0;
+      color: var(--coral);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+    }
+
+    .sidebar {
+      background: #16231f;
+      color: #f4faf7;
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 4px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, .12);
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #f0b45d;
+      color: #17231f;
+      font-weight: 900;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      display: block;
+      margin-top: 2px;
+      color: #b9cbc4;
+      font-size: 12px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav button {
+      width: 100%;
+      min-height: 42px;
+      border-radius: var(--radius);
+      background: transparent;
+      color: #d7e5df;
+      text-align: left;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav button.active,
+    .nav button:hover {
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+    }
+
+    .nav-icon {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, .09);
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      display: grid;
+      gap: 10px;
+      color: #b9cbc4;
+      font-size: 13px;
+      border-top: 1px solid rgba(255, 255, 255, .12);
+      padding-top: 16px;
+    }
+
+    .mini-stat {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 26px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .title-block h2 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 38px);
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    .title-block p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      max-width: 720px;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      min-height: 42px;
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      color: var(--ink);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, .02);
+      white-space: nowrap;
+    }
+
+    .btn.primary {
+      background: var(--teal);
+      color: #fff;
+      border-color: var(--teal);
+    }
+
+    .btn.primary:hover {
+      background: var(--teal-2);
+    }
+
+    .btn.danger {
+      color: #fff;
+      background: var(--coral);
+      border-color: var(--coral);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .summary-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px;
+      min-height: 128px;
+      display: grid;
+      align-content: space-between;
+      box-shadow: 0 8px 22px rgba(40, 52, 47, .05);
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .metric .value {
+      margin-top: 12px;
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 850;
+      line-height: 1;
+      word-break: break-word;
+    }
+
+    .metric .hint {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 12px;
+    }
+
+    .metric.balance {
+      background: #17302b;
+      color: #fff;
+      border-color: #17302b;
+    }
+
+    .metric.balance .label,
+    .metric.balance .hint {
+      color: #bdd0ca;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(340px, .65fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .panel-header {
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: minmax(220px, 1.2fr) repeat(3, minmax(120px, .8fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 9px 11px;
+      background: #fff;
+      color: var(--ink);
+      outline: none;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(22, 120, 111, .13);
+    }
+
+    textarea {
+      min-height: 72px;
+      resize: vertical;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      background: #fff;
+    }
+
+    th,
+    td {
+      padding: 13px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      font-size: 12px;
+      color: var(--muted);
+      background: #f8faf8;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .type-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 46px;
+      min-height: 24px;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .income {
+      background: rgba(36, 134, 90, .12);
+      color: var(--green);
+    }
+
+    .expense {
+      background: rgba(211, 95, 74, .12);
+      color: var(--coral);
+    }
+
+    .amount-income {
+      color: var(--green);
+      font-weight: 850;
+    }
+
+    .amount-expense {
+      color: var(--coral);
+      font-weight: 850;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-grid .wide {
+      grid-column: 1 / -1;
+    }
+
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      min-height: 42px;
+    }
+
+    .segmented button {
+      background: #fff;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .segmented button.active {
+      background: var(--teal);
+      color: #fff;
+    }
+
+    .member-list,
+    .category-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .person,
+    .category-row,
+    .budget-row {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      background: #fff;
+    }
+
+    .person-top,
+    .category-top,
+    .budget-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--surface-2);
+      color: var(--teal);
+      font-weight: 900;
+      flex: 0 0 auto;
+    }
+
+    .person-name {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+    }
+
+    .person-name strong {
+      overflow-wrap: anywhere;
+    }
+
+    .settlement {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .settlement-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      color: var(--ink);
+    }
+
+    .progress {
+      width: 100%;
+      height: 9px;
+      background: #e6ece8;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress span {
+      display: block;
+      height: 100%;
+      background: var(--teal);
+      width: 0%;
+    }
+
+    .progress.warning span {
+      background: var(--amber);
+    }
+
+    .progress.danger span {
+      background: var(--coral);
+    }
+
+    .tabs {
+      display: none;
+    }
+
+    .view {
+      display: block;
+    }
+
+    .view.hidden {
+      display: none;
+    }
+
+    .empty {
+      padding: 34px 16px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      background: #fbfcfb;
+    }
+
+    .toast {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 10;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      background: #17231f;
+      color: #fff;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: .22s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1080px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+
+      .nav {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .sidebar-footer {
+        display: none;
+      }
+
+      .workspace,
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .main {
+        padding: 18px 14px 26px;
+      }
+
+      .topbar,
+      .panel-header {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .actions {
+        justify-content: stretch;
+      }
+
+      .actions .btn {
+        flex: 1 1 150px;
+      }
+
+      .workspace,
+      .summary-grid,
+      .filters,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .metric {
+        min-height: 112px;
+      }
+    }
+  </style>
+</head>
+<body class="auth-locked">
+  <section class="auth-screen" aria-label="登入">
+    <form class="auth-card" id="authForm">
+      <div class="brand">
+        <div class="brand-mark">共</div>
+        <div>
+          <h1>共同帳戶</h1>
+          <span>收支與分攤控管</span>
+        </div>
+      </div>
+      <h2>登入後查看</h2>
+      <p>請輸入共同帳戶密碼，登入後即可查看與管理收支資料。</p>
+      <label class="field" for="authPassword">
+        <span>密碼</span>
+        <input id="authPassword" type="password" autocomplete="current-password" required placeholder="請輸入密碼">
+      </label>
+      <button class="btn primary" type="submit" style="width:100%; margin-top:14px;">登入</button>
+      <div class="auth-error" id="authError" aria-live="polite"></div>
+    </form>
+  </section>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">共</div>
+        <div>
+          <h1>共同帳戶</h1>
+          <span>收支與分攤控管</span>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="主選單">
+        <button class="active" data-view-target="overview"><span class="nav-icon">總</span>總覽</button>
+        <button data-view-target="transactions"><span class="nav-icon">帳</span>明細</button>
+        <button data-view-target="members"><span class="nav-icon">人</span>成員</button>
+        <button data-view-target="budgets"><span class="nav-icon">限</span>預算</button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="mini-stat"><span>交易筆數</span><strong id="sideCount">0</strong></div>
+        <div class="mini-stat"><span>成員數</span><strong id="sideMembers">0</strong></div>
+        <div class="mini-stat"><span>本月淨額</span><strong id="sideNet">$0</strong></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="title-block">
+          <h2>共同帳戶收支系統</h2>
+          <p>管理家庭、室友、社團或專案基金的收入、支出、付款人、分攤對象與每月預算。</p>
+        </div>
+        <div class="actions">
+          <button class="btn" id="exportCsv">匯出 CSV</button>
+          <button class="btn" id="seedData">載入範例</button>
+          <button class="btn" id="logout">登出</button>
+          <button class="btn danger" id="clearData">清空資料</button>
+        </div>
+      </div>
+
+      <section class="grid summary-grid" aria-label="摘要">
+        <article class="metric balance">
+          <div class="label">目前結餘</div>
+          <div class="value" id="totalBalance">$0</div>
+          <div class="hint" id="balanceHint">共同帳戶累計淨額</div>
+        </article>
+        <article class="metric">
+          <div class="label">本月收入</div>
+          <div class="value amount-income" id="monthIncome">$0</div>
+          <div class="hint">本月所有入帳合計</div>
+        </article>
+        <article class="metric">
+          <div class="label">本月支出</div>
+          <div class="value amount-expense" id="monthExpense">$0</div>
+          <div class="hint">本月所有出帳合計</div>
+        </article>
+        <article class="metric">
+          <div class="label">本月淨額</div>
+          <div class="value" id="monthNet">$0</div>
+          <div class="hint">收入減支出</div>
+        </article>
+      </section>
+
+      <section class="workspace">
+        <div class="grid">
+          <section class="panel view" id="overviewView">
+            <div class="panel-header">
+              <h3>最近交易</h3>
+              <button class="btn ghost" data-view-target="transactions">查看全部</button>
+            </div>
+            <div class="panel-body">
+              <div id="recentTransactions"></div>
+            </div>
+          </section>
+
+          <section class="panel view hidden" id="transactionsView">
+            <div class="panel-header">
+              <h3>收支明細</h3>
+              <button class="btn ghost" id="resetFilters">重設篩選</button>
+            </div>
+            <div class="panel-body">
+              <div class="filters">
+                <div class="field">
+                  <label for="searchText">搜尋</label>
+                  <input id="searchText" type="search" placeholder="輸入項目、備註或成員">
+                </div>
+                <div class="field">
+                  <label for="filterType">類型</label>
+                  <select id="filterType">
+                    <option value="all">全部</option>
+                    <option value="income">收入</option>
+                    <option value="expense">支出</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="filterMember">成員</label>
+                  <select id="filterMember"></select>
+                </div>
+                <div class="field">
+                  <label for="filterMonth">月份</label>
+                  <input id="filterMonth" type="month">
+                </div>
+              </div>
+              <div id="transactionTable"></div>
+            </div>
+          </section>
+
+          <section class="panel view hidden" id="membersView">
+            <div class="panel-header">
+              <h3>成員分攤</h3>
+            </div>
+            <div class="panel-body">
+              <div class="member-list" id="memberSummary"></div>
+              <div class="settlement" id="settlementList"></div>
+            </div>
+          </section>
+
+          <section class="panel view hidden" id="budgetsView">
+            <div class="panel-header">
+              <h3>月度預算</h3>
+            </div>
+            <div class="panel-body">
+              <div class="category-list" id="budgetList"></div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="grid">
+          <section class="panel">
+            <div class="panel-header">
+              <h3 id="formTitle">新增交易</h3>
+              <button class="btn ghost" id="cancelEdit" hidden>取消編輯</button>
+            </div>
+            <div class="panel-body">
+              <form id="transactionForm" class="form-grid">
+                <input type="hidden" id="editId">
+                <div class="wide">
+                  <label class="field">
+                    <span>交易類型</span>
+                    <span class="segmented">
+                      <button type="button" class="active" data-type="expense">支出</button>
+                      <button type="button" data-type="income">收入</button>
+                    </span>
+                  </label>
+                </div>
+                <div class="field">
+                  <label for="date">日期</label>
+                  <input id="date" type="date" required>
+                </div>
+                <div class="field">
+                  <label for="amount">金額</label>
+                  <input id="amount" type="number" min="1" step="1" required placeholder="例如 1200">
+                </div>
+                <div class="field">
+                  <label for="category">類別</label>
+                  <select id="category" required></select>
+                </div>
+                <div class="field">
+                  <label for="payer">付款人</label>
+                  <select id="payer" required></select>
+                </div>
+                <div class="field wide">
+                  <label for="title">項目</label>
+                  <input id="title" required maxlength="80" placeholder="例如 房租、水電、共同基金入帳">
+                </div>
+                <div class="field wide">
+                  <label for="participants">分攤對象</label>
+                  <select id="participants" multiple size="4"></select>
+                </div>
+                <div class="field wide">
+                  <label for="note">備註</label>
+                  <textarea id="note" maxlength="180" placeholder="選填"></textarea>
+                </div>
+                <div class="wide">
+                  <button class="btn primary" type="submit" id="submitBtn">加入交易</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h3>成員設定</h3>
+            </div>
+            <div class="panel-body">
+              <form id="memberForm" class="form-grid">
+                <div class="field">
+                  <label for="memberName">姓名</label>
+                  <input id="memberName" maxlength="24" placeholder="新增成員">
+                </div>
+                <div class="field">
+                  <label for="memberShare">分攤比例</label>
+                  <input id="memberShare" type="number" min="1" step="1" value="1">
+                </div>
+                <div class="wide">
+                  <button class="btn" type="submit">新增成員</button>
+                </div>
+              </form>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <h3>類別預算</h3>
+            </div>
+            <div class="panel-body">
+              <form id="budgetForm" class="form-grid">
+                <div class="field">
+                  <label for="budgetCategory">類別</label>
+                  <select id="budgetCategory"></select>
+                </div>
+                <div class="field">
+                  <label for="budgetAmount">月預算</label>
+                  <input id="budgetAmount" type="number" min="0" step="1" placeholder="例如 10000">
+                </div>
+                <div class="wide">
+                  <button class="btn" type="submit">儲存預算</button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    window.__SERVER_AUTH_PROTECTED__ = false;
+    const storageKey = "jointAccountSystem.v1";
+    const authKey = "jointAccountSystem.authenticated";
+    const passwordHash = "4c129f69f551195cbc5e8b57cc5a0975b6efa1e8510573524d11df03c7d010c6";
+    const categories = ["房租", "水電瓦斯", "餐飲", "交通", "日用品", "娛樂", "醫療", "收入", "其他"];
+    const currency = new Intl.NumberFormat("zh-TW", {
+      style: "currency",
+      currency: "TWD",
+      maximumFractionDigits: 0
+    });
+
+    const sampleState = {
+      members: [
+        { id: "m1", name: "怡君", share: 1 },
+        { id: "m2", name: "家豪", share: 1 },
+        { id: "m3", name: "小安", share: 1 }
+      ],
+      budgets: {
+        "房租": 28000,
+        "水電瓦斯": 4200,
+        "餐飲": 12000,
+        "日用品": 6000,
+        "娛樂": 5000
+      },
+      transactions: [
+        {
+          id: "t1",
+          type: "expense",
+          date: todayOffset(-18),
+          title: "六月房租",
+          category: "房租",
+          amount: 28000,
+          payerId: "m1",
+          participantIds: ["m1", "m2", "m3"],
+          note: "三人平均分攤"
+        },
+        {
+          id: "t2",
+          type: "expense",
+          date: todayOffset(-10),
+          title: "超市採買",
+          category: "日用品",
+          amount: 3680,
+          payerId: "m2",
+          participantIds: ["m1", "m2", "m3"],
+          note: "清潔用品與早餐"
+        },
+        {
+          id: "t3",
+          type: "income",
+          date: todayOffset(-8),
+          title: "共同基金入帳",
+          category: "收入",
+          amount: 15000,
+          payerId: "m3",
+          participantIds: ["m1", "m2", "m3"],
+          note: "本月預收"
+        },
+        {
+          id: "t4",
+          type: "expense",
+          date: todayOffset(-3),
+          title: "晚餐聚餐",
+          category: "餐飲",
+          amount: 2460,
+          payerId: "m1",
+          participantIds: ["m1", "m2"],
+          note: "小安未參與"
+        }
+      ]
+    };
+
+    let state = loadState();
+    let currentType = "expense";
+    let appStarted = false;
+
+    const els = {
+      authForm: document.querySelector("#authForm"),
+      authPassword: document.querySelector("#authPassword"),
+      authError: document.querySelector("#authError"),
+      authScreen: document.querySelector(".auth-screen"),
+      totalBalance: document.querySelector("#totalBalance"),
+      monthIncome: document.querySelector("#monthIncome"),
+      monthExpense: document.querySelector("#monthExpense"),
+      monthNet: document.querySelector("#monthNet"),
+      sideCount: document.querySelector("#sideCount"),
+      sideMembers: document.querySelector("#sideMembers"),
+      sideNet: document.querySelector("#sideNet"),
+      recentTransactions: document.querySelector("#recentTransactions"),
+      transactionTable: document.querySelector("#transactionTable"),
+      memberSummary: document.querySelector("#memberSummary"),
+      settlementList: document.querySelector("#settlementList"),
+      budgetList: document.querySelector("#budgetList"),
+      filterType: document.querySelector("#filterType"),
+      filterMember: document.querySelector("#filterMember"),
+      filterMonth: document.querySelector("#filterMonth"),
+      searchText: document.querySelector("#searchText"),
+      category: document.querySelector("#category"),
+      payer: document.querySelector("#payer"),
+      participants: document.querySelector("#participants"),
+      budgetCategory: document.querySelector("#budgetCategory"),
+      toast: document.querySelector("#toast"),
+      editId: document.querySelector("#editId"),
+      formTitle: document.querySelector("#formTitle"),
+      submitBtn: document.querySelector("#submitBtn"),
+      cancelEdit: document.querySelector("#cancelEdit"),
+      logout: document.querySelector("#logout")
+    };
+
+    initialize();
+
+    function initialize() {
+      bindAuthEvents();
+      if (!isServerAuthProtected() && !isAuthenticated()) {
+        document.body.classList.add("auth-locked");
+        els.authPassword.focus();
+        return;
+      }
+      unlockApp();
+    }
+
+    function startApp() {
+      if (appStarted) return;
+      document.querySelector("#date").value = new Date().toISOString().slice(0, 10);
+      els.filterMonth.value = new Date().toISOString().slice(0, 7);
+      fillStaticSelects();
+      bindEvents();
+      render();
+      appStarted = true;
+    }
+
+    function bindAuthEvents() {
+      els.authForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        els.authError.textContent = "";
+        const enteredHash = await hashText(els.authPassword.value);
+        if (enteredHash === passwordHash) {
+          sessionStorage.setItem(authKey, "yes");
+          unlockApp();
+          showToast("登入成功");
+          return;
+        }
+        els.authError.textContent = "密碼不正確，請再試一次";
+        els.authPassword.select();
+      });
+    }
+
+    function isAuthenticated() {
+      return sessionStorage.getItem(authKey) === "yes";
+    }
+
+    function isServerAuthProtected() {
+      return window.__SERVER_AUTH_PROTECTED__ === true;
+    }
+
+    function unlockApp() {
+      document.body.classList.remove("auth-locked");
+      els.authScreen.setAttribute("hidden", "");
+      startApp();
+    }
+
+    function lockApp() {
+      sessionStorage.removeItem(authKey);
+      document.body.classList.add("auth-locked");
+      els.authScreen.removeAttribute("hidden");
+      els.authPassword.value = "";
+      els.authError.textContent = "";
+      els.authPassword.focus();
+    }
+
+    async function hashText(text) {
+      if (!window.crypto || !window.crypto.subtle) {
+        els.authError.textContent = "此瀏覽器不支援安全登入驗證";
+        return "";
+      }
+      const data = new TextEncoder().encode(text);
+      const digest = await window.crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest))
+        .map((byte) => byte.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("[data-view-target]").forEach((button) => {
+        button.addEventListener("click", () => switchView(button.dataset.viewTarget));
+      });
+
+      document.querySelectorAll("[data-type]").forEach((button) => {
+        button.addEventListener("click", () => {
+          currentType = button.dataset.type;
+          document.querySelectorAll("[data-type]").forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+          syncCategoryForType();
+        });
+      });
+
+      document.querySelector("#transactionForm").addEventListener("submit", saveTransaction);
+      document.querySelector("#memberForm").addEventListener("submit", saveMember);
+      document.querySelector("#budgetForm").addEventListener("submit", saveBudget);
+      document.querySelector("#exportCsv").addEventListener("click", exportCsv);
+      document.querySelector("#seedData").addEventListener("click", () => {
+        state = structuredClone(sampleState);
+        persist();
+        render();
+        showToast("已載入範例資料");
+      });
+      document.querySelector("#clearData").addEventListener("click", clearAll);
+      document.querySelector("#resetFilters").addEventListener("click", resetFilters);
+      els.logout.addEventListener("click", lockApp);
+      els.cancelEdit.addEventListener("click", resetTransactionForm);
+      [els.filterType, els.filterMember, els.filterMonth, els.searchText].forEach((field) => {
+        field.addEventListener("input", renderTransactions);
+      });
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) return structuredClone(sampleState);
+        const parsed = JSON.parse(raw);
+        return {
+          members: Array.isArray(parsed.members) ? parsed.members : sampleState.members,
+          budgets: parsed.budgets || {},
+          transactions: Array.isArray(parsed.transactions) ? parsed.transactions : []
+        };
+      } catch {
+        return structuredClone(sampleState);
+      }
+    }
+
+    function persist() {
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function fillStaticSelects() {
+      els.category.innerHTML = categories.map((item) => `<option value="${escapeAttr(item)}">${escapeHtml(item)}</option>`).join("");
+      els.budgetCategory.innerHTML = categories
+        .filter((item) => item !== "收入")
+        .map((item) => `<option value="${escapeAttr(item)}">${escapeHtml(item)}</option>`)
+        .join("");
+      syncCategoryForType();
+    }
+
+    function syncCategoryForType() {
+      if (currentType === "income") {
+        els.category.value = "收入";
+      } else if (els.category.value === "收入") {
+        els.category.value = "其他";
+      }
+    }
+
+    function render() {
+      renderSelectors();
+      renderSummary();
+      renderRecent();
+      renderTransactions();
+      renderMembers();
+      renderBudgets();
+    }
+
+    function renderSelectors() {
+      const memberOptions = state.members
+        .map((member) => `<option value="${member.id}">${escapeHtml(member.name)}</option>`)
+        .join("");
+      els.payer.innerHTML = memberOptions;
+      els.participants.innerHTML = memberOptions;
+      els.filterMember.innerHTML = `<option value="all">全部</option>${memberOptions}`;
+
+      Array.from(els.participants.options).forEach((option) => {
+        option.selected = true;
+      });
+    }
+
+    function renderSummary() {
+      const totals = getTotals();
+      els.totalBalance.textContent = currency.format(totals.balance);
+      els.monthIncome.textContent = currency.format(totals.monthIncome);
+      els.monthExpense.textContent = currency.format(totals.monthExpense);
+      els.monthNet.textContent = currency.format(totals.monthNet);
+      els.monthNet.className = `value ${totals.monthNet >= 0 ? "amount-income" : "amount-expense"}`;
+      els.sideCount.textContent = state.transactions.length;
+      els.sideMembers.textContent = state.members.length;
+      els.sideNet.textContent = currency.format(totals.monthNet);
+    }
+
+    function getTotals() {
+      const month = els.filterMonth.value || new Date().toISOString().slice(0, 7);
+      let income = 0;
+      let expense = 0;
+      let monthIncome = 0;
+      let monthExpense = 0;
+
+      state.transactions.forEach((item) => {
+        const amount = Number(item.amount) || 0;
+        if (item.type === "income") income += amount;
+        if (item.type === "expense") expense += amount;
+        if (item.date.slice(0, 7) === month) {
+          if (item.type === "income") monthIncome += amount;
+          if (item.type === "expense") monthExpense += amount;
+        }
+      });
+
+      return {
+        balance: income - expense,
+        monthIncome,
+        monthExpense,
+        monthNet: monthIncome - monthExpense
+      };
+    }
+
+    function renderRecent() {
+      const recent = sortedTransactions().slice(0, 6);
+      els.recentTransactions.innerHTML = recent.length ? tableFor(recent, false) : emptyState("尚未有交易資料");
+    }
+
+    function renderTransactions() {
+      const rows = filteredTransactions();
+      els.transactionTable.innerHTML = rows.length ? tableFor(rows, true) : emptyState("沒有符合條件的交易");
+    }
+
+    function filteredTransactions() {
+      const type = els.filterType.value;
+      const memberId = els.filterMember.value;
+      const month = els.filterMonth.value;
+      const keyword = els.searchText.value.trim().toLowerCase();
+
+      return sortedTransactions().filter((item) => {
+        const payer = findMember(item.payerId)?.name || "";
+        const participantNames = item.participantIds.map((id) => findMember(id)?.name || "").join(" ");
+        const haystack = `${item.title} ${item.category} ${item.note || ""} ${payer} ${participantNames}`.toLowerCase();
+
+        if (type !== "all" && item.type !== type) return false;
+        if (memberId !== "all" && item.payerId !== memberId && !item.participantIds.includes(memberId)) return false;
+        if (month && item.date.slice(0, 7) !== month) return false;
+        if (keyword && !haystack.includes(keyword)) return false;
+        return true;
+      });
+    }
+
+    function sortedTransactions() {
+      return [...state.transactions].sort((a, b) => b.date.localeCompare(a.date));
+    }
+
+    function tableFor(rows, withActions) {
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>項目</th>
+                <th>類型</th>
+                <th>類別</th>
+                <th>付款人</th>
+                <th>分攤</th>
+                <th>金額</th>
+                ${withActions ? "<th>操作</th>" : ""}
+              </tr>
+            </thead>
+            <tbody>
+              ${rows.map((item) => transactionRow(item, withActions)).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function transactionRow(item, withActions) {
+      const payer = findMember(item.payerId)?.name || "已移除";
+      const participants = item.participantIds.map((id) => findMember(id)?.name || "已移除").join("、");
+      const amountClass = item.type === "income" ? "amount-income" : "amount-expense";
+      const amountPrefix = item.type === "income" ? "+" : "-";
+      return `
+        <tr>
+          <td>${escapeHtml(item.date)}</td>
+          <td><strong>${escapeHtml(item.title)}</strong>${item.note ? `<br><span class="muted">${escapeHtml(item.note)}</span>` : ""}</td>
+          <td><span class="type-pill ${item.type}">${item.type === "income" ? "收入" : "支出"}</span></td>
+          <td>${escapeHtml(item.category)}</td>
+          <td>${escapeHtml(payer)}</td>
+          <td>${escapeHtml(participants || "未指定")}</td>
+          <td class="${amountClass}">${amountPrefix}${currency.format(Number(item.amount) || 0)}</td>
+          ${withActions ? `
+            <td>
+              <div class="row-actions">
+                <button class="icon-btn" title="編輯" onclick="editTransaction('${item.id}')">編</button>
+                <button class="icon-btn" title="刪除" onclick="deleteTransaction('${item.id}')">刪</button>
+              </div>
+            </td>
+          ` : ""}
+        </tr>
+      `;
+    }
+
+    function renderMembers() {
+      const balances = calculateMemberBalances();
+      els.memberSummary.innerHTML = state.members.length
+        ? state.members.map((member) => {
+          const balance = balances[member.id] || { paid: 0, owed: 0, net: 0 };
+          const netClass = balance.net >= 0 ? "amount-income" : "amount-expense";
+          return `
+            <div class="person">
+              <div class="person-top">
+                <div class="person-name">
+                  <span class="avatar">${escapeHtml(member.name.slice(0, 1))}</span>
+                  <div>
+                    <strong>${escapeHtml(member.name)}</strong>
+                    <div class="muted">分攤比例 ${member.share}</div>
+                  </div>
+                </div>
+                <button class="icon-btn" title="刪除成員" onclick="deleteMember('${member.id}')">刪</button>
+              </div>
+              <div class="mini-stat"><span>已付款</span><strong>${currency.format(balance.paid)}</strong></div>
+              <div class="mini-stat"><span>應分攤</span><strong>${currency.format(balance.owed)}</strong></div>
+              <div class="mini-stat"><span>結算差額</span><strong class="${netClass}">${currency.format(balance.net)}</strong></div>
+            </div>
+          `;
+        }).join("")
+        : emptyState("請先新增成員");
+
+      const settlements = calculateSettlements(balances);
+      els.settlementList.innerHTML = settlements.length
+        ? settlements.map((item) => `
+          <div class="settlement-item">
+            <span>${escapeHtml(item.from)} 轉給 ${escapeHtml(item.to)}</span>
+            <strong>${currency.format(item.amount)}</strong>
+          </div>
+        `).join("")
+        : `<div class="settlement-item"><span>目前不需要互相結算</span><strong>${currency.format(0)}</strong></div>`;
+    }
+
+    function calculateMemberBalances() {
+      const balances = {};
+      state.members.forEach((member) => {
+        balances[member.id] = { paid: 0, owed: 0, net: 0 };
+      });
+
+      state.transactions
+        .filter((item) => item.type === "expense")
+        .forEach((item) => {
+          const amount = Number(item.amount) || 0;
+          if (balances[item.payerId]) {
+            balances[item.payerId].paid += amount;
+          }
+
+          const participantMembers = item.participantIds.map(findMember).filter(Boolean);
+          const totalShare = participantMembers.reduce((sum, member) => sum + Number(member.share || 1), 0);
+          participantMembers.forEach((member) => {
+            const owed = totalShare ? amount * (Number(member.share || 1) / totalShare) : 0;
+            balances[member.id].owed += owed;
+          });
+        });
+
+      Object.values(balances).forEach((item) => {
+        item.net = Math.round(item.paid - item.owed);
+        item.paid = Math.round(item.paid);
+        item.owed = Math.round(item.owed);
+      });
+      return balances;
+    }
+
+    function calculateSettlements(balances) {
+      const debtors = [];
+      const creditors = [];
+
+      state.members.forEach((member) => {
+        const net = Math.round(balances[member.id]?.net || 0);
+        if (net < 0) debtors.push({ name: member.name, amount: Math.abs(net) });
+        if (net > 0) creditors.push({ name: member.name, amount: net });
+      });
+
+      const result = [];
+      let i = 0;
+      let j = 0;
+      while (i < debtors.length && j < creditors.length) {
+        const amount = Math.min(debtors[i].amount, creditors[j].amount);
+        if (amount > 0) {
+          result.push({ from: debtors[i].name, to: creditors[j].name, amount });
+        }
+        debtors[i].amount -= amount;
+        creditors[j].amount -= amount;
+        if (debtors[i].amount <= 0) i += 1;
+        if (creditors[j].amount <= 0) j += 1;
+      }
+      return result;
+    }
+
+    function renderBudgets() {
+      const month = els.filterMonth.value || new Date().toISOString().slice(0, 7);
+      const spending = {};
+      categories.forEach((item) => spending[item] = 0);
+      state.transactions
+        .filter((item) => item.type === "expense" && item.date.slice(0, 7) === month)
+        .forEach((item) => {
+          spending[item.category] = (spending[item.category] || 0) + Number(item.amount || 0);
+        });
+
+      els.budgetList.innerHTML = categories
+        .filter((item) => item !== "收入")
+        .map((category) => {
+          const limit = Number(state.budgets[category] || 0);
+          const used = Number(spending[category] || 0);
+          const percent = limit ? Math.min(100, Math.round((used / limit) * 100)) : 0;
+          const progressClass = percent >= 100 ? "danger" : percent >= 80 ? "warning" : "";
+          const remain = limit - used;
+          return `
+            <div class="budget-row">
+              <div class="budget-top">
+                <strong>${escapeHtml(category)}</strong>
+                <span class="muted">${limit ? `${percent}%` : "未設定"}</span>
+              </div>
+              <div class="progress ${progressClass}"><span style="width:${percent}%"></span></div>
+              <div class="mini-stat"><span>本月已用</span><strong>${currency.format(used)}</strong></div>
+              <div class="mini-stat"><span>剩餘預算</span><strong class="${remain >= 0 ? "amount-income" : "amount-expense"}">${currency.format(remain)}</strong></div>
+            </div>
+          `;
+        }).join("");
+    }
+
+    function saveTransaction(event) {
+      event.preventDefault();
+      if (!state.members.length) {
+        showToast("請先新增至少一位成員");
+        return;
+      }
+
+      const selectedParticipants = Array.from(els.participants.selectedOptions).map((option) => option.value);
+      const transaction = {
+        id: els.editId.value || makeId(),
+        type: currentType,
+        date: document.querySelector("#date").value,
+        title: document.querySelector("#title").value.trim(),
+        category: els.category.value,
+        amount: Number(document.querySelector("#amount").value),
+        payerId: els.payer.value,
+        participantIds: selectedParticipants.length ? selectedParticipants : [els.payer.value],
+        note: document.querySelector("#note").value.trim()
+      };
+
+      if (transaction.type === "income") {
+        transaction.category = "收入";
+      }
+
+      if (els.editId.value) {
+        state.transactions = state.transactions.map((item) => item.id === transaction.id ? transaction : item);
+        showToast("交易已更新");
+      } else {
+        state.transactions.push(transaction);
+        showToast("交易已加入");
+      }
+
+      persist();
+      resetTransactionForm();
+      render();
+    }
+
+    function editTransaction(id) {
+      const item = state.transactions.find((transaction) => transaction.id === id);
+      if (!item) return;
+      currentType = item.type;
+      document.querySelectorAll("[data-type]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.type === currentType);
+      });
+      els.editId.value = item.id;
+      document.querySelector("#date").value = item.date;
+      document.querySelector("#amount").value = item.amount;
+      document.querySelector("#title").value = item.title;
+      els.category.value = item.category;
+      els.payer.value = item.payerId;
+      document.querySelector("#note").value = item.note || "";
+      Array.from(els.participants.options).forEach((option) => {
+        option.selected = item.participantIds.includes(option.value);
+      });
+      els.formTitle.textContent = "編輯交易";
+      els.submitBtn.textContent = "儲存交易";
+      els.cancelEdit.hidden = false;
+      showToast("已載入交易");
+    }
+
+    function deleteTransaction(id) {
+      state.transactions = state.transactions.filter((item) => item.id !== id);
+      persist();
+      render();
+      showToast("交易已刪除");
+    }
+
+    function resetTransactionForm() {
+      document.querySelector("#transactionForm").reset();
+      els.editId.value = "";
+      document.querySelector("#date").value = new Date().toISOString().slice(0, 10);
+      currentType = "expense";
+      document.querySelectorAll("[data-type]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.type === "expense");
+      });
+      els.formTitle.textContent = "新增交易";
+      els.submitBtn.textContent = "加入交易";
+      els.cancelEdit.hidden = true;
+      renderSelectors();
+      syncCategoryForType();
+    }
+
+    function saveMember(event) {
+      event.preventDefault();
+      const name = document.querySelector("#memberName").value.trim();
+      const share = Math.max(1, Number(document.querySelector("#memberShare").value || 1));
+      if (!name) return;
+      state.members.push({ id: makeId(), name, share });
+      persist();
+      event.target.reset();
+      document.querySelector("#memberShare").value = 1;
+      render();
+      showToast("成員已新增");
+    }
+
+    function deleteMember(id) {
+      const isUsed = state.transactions.some((item) => item.payerId === id || item.participantIds.includes(id));
+      if (isUsed) {
+        showToast("此成員已有交易，請先調整明細");
+        return;
+      }
+      state.members = state.members.filter((member) => member.id !== id);
+      persist();
+      render();
+      showToast("成員已刪除");
+    }
+
+    function saveBudget(event) {
+      event.preventDefault();
+      const category = els.budgetCategory.value;
+      const amount = Math.max(0, Number(document.querySelector("#budgetAmount").value || 0));
+      state.budgets[category] = amount;
+      persist();
+      document.querySelector("#budgetAmount").value = "";
+      renderBudgets();
+      showToast("預算已儲存");
+    }
+
+    function clearAll() {
+      state = { members: [], budgets: {}, transactions: [] };
+      persist();
+      render();
+      showToast("資料已清空");
+    }
+
+    function resetFilters() {
+      els.searchText.value = "";
+      els.filterType.value = "all";
+      els.filterMember.value = "all";
+      els.filterMonth.value = new Date().toISOString().slice(0, 7);
+      renderTransactions();
+      renderSummary();
+      renderBudgets();
+    }
+
+    function switchView(name) {
+      document.querySelectorAll("[data-view-target]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.viewTarget === name);
+      });
+      document.querySelectorAll(".view").forEach((view) => view.classList.add("hidden"));
+      document.querySelector(`#${name}View`).classList.remove("hidden");
+    }
+
+    function exportCsv() {
+      const header = ["日期", "類型", "類別", "項目", "付款人", "分攤對象", "金額", "備註"];
+      const rows = sortedTransactions().map((item) => [
+        item.date,
+        item.type === "income" ? "收入" : "支出",
+        item.category,
+        item.title,
+        findMember(item.payerId)?.name || "",
+        item.participantIds.map((id) => findMember(id)?.name || "").join("、"),
+        item.amount,
+        item.note || ""
+      ]);
+      const csv = [header, ...rows]
+        .map((row) => row.map((cell) => `"${String(cell).replaceAll('"', '""')}"`).join(","))
+        .join("\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `共同帳戶收支-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+      showToast("CSV 已匯出");
+    }
+
+    function findMember(id) {
+      return state.members.find((member) => member.id === id);
+    }
+
+    function emptyState(text) {
+      return `<div class="empty">${escapeHtml(text)}</div>`;
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      window.clearTimeout(showToast.timer);
+      showToast.timer = window.setTimeout(() => els.toast.classList.remove("show"), 1800);
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+
+    function todayOffset(days) {
+      const date = new Date();
+      date.setDate(date.getDate() + days);
+      return date.toISOString().slice(0, 10);
+    }
+
+    function makeId() {
+      if (window.crypto && typeof window.crypto.randomUUID === "function") {
+        return window.crypto.randomUUID();
+      }
+      return `id-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+  </script>
+</body>
+</html>
