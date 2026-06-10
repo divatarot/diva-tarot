@@ -1091,7 +1091,7 @@
     });
 
     const sampleState = {
-      updatedAt: Date.now(),
+      updatedAt: 0,
       members: [
         { id: "m1", name: "怡君", share: 1, role: "家人", active: true },
         { id: "m2", name: "家豪", share: 1, role: "家人", active: true },
@@ -1380,7 +1380,7 @@
     function normalizeState(input) {
       const next = input && typeof input === "object" ? input : {};
       return {
-        updatedAt: Number(next.updatedAt || Date.now()),
+        updatedAt: Number(next.updatedAt ?? Date.now()),
         members: Array.isArray(next.members) ? next.members.map(normalizeMember) : structuredClone(sampleState.members),
         budgets: next.budgets && typeof next.budgets === "object" ? next.budgets : {},
         transactions: Array.isArray(next.transactions) ? next.transactions.map(normalizeTransaction) : []
@@ -1410,6 +1410,27 @@
         participantIds: Array.isArray(item.participantIds) ? item.participantIds : [],
         note: item.note || ""
       };
+    }
+
+    function hasCloudData(payload) {
+      return Boolean(payload && typeof payload === "object" && (
+        payload.updatedAt ||
+        payload.members ||
+        payload.transactions ||
+        payload.budgets
+      ));
+    }
+
+    function isSampleData(candidate) {
+      const next = candidate && typeof candidate === "object" ? candidate : {};
+      const memberIds = Array.isArray(next.members) ? next.members.map((item) => item.id).join(",") : "";
+      const transactionIds = Array.isArray(next.transactions) ? next.transactions.map((item) => item.id).join(",") : "";
+      const sampleMemberIds = sampleState.members.map((item) => item.id).join(",");
+      const sampleTransactionIds = sampleState.transactions.map((item) => item.id).join(",");
+
+      return memberIds === sampleMemberIds &&
+        transactionIds === sampleTransactionIds &&
+        JSON.stringify(next.budgets || {}) === JSON.stringify(sampleState.budgets || {});
     }
 
     function inferLedger(category) {
@@ -1461,13 +1482,17 @@
         if (!response.ok) throw new Error("remote state unavailable");
 
         const payload = await response.json();
-        if (!payload.updatedAt && !payload.members && !payload.transactions) {
-          await saveRemoteState();
+        if (!hasCloudData(payload)) {
+          if (!isSampleData(state)) {
+            await saveRemoteState();
+          } else {
+            setSyncStatus("synced", "已同步");
+          }
           return;
         }
 
         const remoteState = normalizeState(payload);
-        if (Number(remoteState.updatedAt || 0) > Number(state.updatedAt || 0)) {
+        if (isSampleData(state) || Number(remoteState.updatedAt || 0) > Number(state.updatedAt || 0)) {
           saveLocalOnly(remoteState);
           render();
           showToast("已載入共同資料");
