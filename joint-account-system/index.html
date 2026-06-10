@@ -103,6 +103,11 @@
       cursor: pointer;
     }
 
+    [hidden],
+    .hidden {
+      display: none !important;
+    }
+
     .app {
       min-height: 100vh;
       display: grid;
@@ -203,6 +208,38 @@
       display: flex;
       justify-content: space-between;
       gap: 12px;
+    }
+
+    .status-pill {
+      min-height: 42px;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .sync-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--amber);
+      flex: 0 0 auto;
+    }
+
+    .status-pill.synced .sync-dot {
+      background: var(--green);
+    }
+
+    .status-pill.local .sync-dot,
+    .status-pill.error .sync-dot {
+      background: var(--coral);
     }
 
     .main {
@@ -362,7 +399,7 @@
 
     .filters {
       display: grid;
-      grid-template-columns: minmax(220px, 1.2fr) repeat(3, minmax(120px, .8fr));
+      grid-template-columns: minmax(220px, 1.2fr) repeat(4, minmax(120px, .8fr));
       gap: 10px;
       margin-bottom: 14px;
     }
@@ -473,6 +510,25 @@
       color: var(--muted);
     }
 
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      background: var(--surface-2);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
     .row-actions {
       display: flex;
       gap: 8px;
@@ -566,6 +622,24 @@
 
     .person-name strong {
       overflow-wrap: anywhere;
+    }
+
+    .checkbox-field {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 9px 11px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .checkbox-field input {
+      width: auto;
+      min-height: auto;
     }
 
     .settlement {
@@ -759,9 +833,10 @@
       <div class="topbar">
         <div class="title-block">
           <h2>共同帳戶收支系統</h2>
-          <p>管理家庭、室友、社團或專案基金的收入、支出、付款人、分攤對象與每月預算。</p>
+          <p>管理家庭、投資、代買、旅遊玩樂等共同支出，讓每個人都看得懂誰先付、誰要分攤、目前還差多少。</p>
         </div>
         <div class="actions">
+          <span class="status-pill local" id="syncStatus"><span class="sync-dot"></span>本機儲存</span>
           <button class="btn" id="exportCsv">匯出 CSV</button>
           <button class="btn" id="seedData">載入範例</button>
           <button class="btn" id="logout">登出</button>
@@ -824,6 +899,10 @@
                   </select>
                 </div>
                 <div class="field">
+                  <label for="filterLedger">帳本</label>
+                  <select id="filterLedger"></select>
+                </div>
+                <div class="field">
                   <label for="filterMember">成員</label>
                   <select id="filterMember"></select>
                 </div>
@@ -860,7 +939,7 @@
           <section class="panel">
             <div class="panel-header">
               <h3 id="formTitle">新增交易</h3>
-              <button class="btn ghost" id="cancelEdit" hidden>取消編輯</button>
+              <button class="btn ghost hidden" id="cancelEdit" type="button">取消編輯</button>
             </div>
             <div class="panel-body">
               <form id="transactionForm" class="form-grid">
@@ -885,6 +964,10 @@
                 <div class="field">
                   <label for="category">類別</label>
                   <select id="category" required></select>
+                </div>
+                <div class="field">
+                  <label for="ledger">帳本用途</label>
+                  <select id="ledger" required></select>
                 </div>
                 <div class="field">
                   <label for="payer">付款人</label>
@@ -915,6 +998,7 @@
             </div>
             <div class="panel-body">
               <form id="memberForm" class="form-grid">
+                <input type="hidden" id="memberEditId">
                 <div class="field">
                   <label for="memberName">姓名</label>
                   <input id="memberName" maxlength="24" placeholder="新增成員">
@@ -923,8 +1007,17 @@
                   <label for="memberShare">分攤比例</label>
                   <input id="memberShare" type="number" min="1" step="1" value="1">
                 </div>
+                <div class="field">
+                  <label for="memberRole">角色</label>
+                  <select id="memberRole"></select>
+                </div>
+                <label class="checkbox-field" for="memberActive">
+                  <input id="memberActive" type="checkbox" checked>
+                  啟用此成員
+                </label>
                 <div class="wide">
-                  <button class="btn" type="submit">新增成員</button>
+                  <button class="btn" type="submit" id="memberSubmitBtn">新增成員</button>
+                  <button class="btn ghost hidden" type="button" id="cancelMemberEdit">取消</button>
                 </div>
               </form>
             </div>
@@ -959,10 +1052,38 @@
 
   <script>
     window.__SERVER_AUTH_PROTECTED__ = false;
-    const storageKey = "jointAccountSystem.v1";
+    const storageKey = "jointAccountSystem.v2";
+    const legacyStorageKey = "jointAccountSystem.v1";
     const authKey = "jointAccountSystem.authenticated";
     const passwordHash = "4c129f69f551195cbc5e8b57cc5a0975b6efa1e8510573524d11df03c7d010c6";
-    const categories = ["房租", "水電瓦斯", "餐飲", "交通", "日用品", "娛樂", "醫療", "收入", "其他"];
+    const remoteStateUrl = "/api/joint-account-state";
+    const categories = [
+      "房租",
+      "水電瓦斯",
+      "餐飲",
+      "交通",
+      "日用品",
+      "醫療",
+      "教育",
+      "家庭",
+      "投資本金",
+      "投資收益",
+      "投資損益",
+      "代買",
+      "旅遊",
+      "玩樂",
+      "收入",
+      "其他"
+    ];
+    const ledgers = [
+      { id: "family", name: "家庭" },
+      { id: "investment", name: "投資" },
+      { id: "purchase", name: "代買" },
+      { id: "travel", name: "旅遊" },
+      { id: "fun", name: "玩樂" },
+      { id: "shared", name: "共同基金" }
+    ];
+    const memberRoles = ["家人", "伴侶", "小孩", "長輩", "朋友", "代買人", "投資成員", "其他"];
     const currency = new Intl.NumberFormat("zh-TW", {
       style: "currency",
       currency: "TWD",
@@ -970,17 +1091,19 @@
     });
 
     const sampleState = {
+      updatedAt: Date.now(),
       members: [
-        { id: "m1", name: "怡君", share: 1 },
-        { id: "m2", name: "家豪", share: 1 },
-        { id: "m3", name: "小安", share: 1 }
+        { id: "m1", name: "怡君", share: 1, role: "家人", active: true },
+        { id: "m2", name: "家豪", share: 1, role: "家人", active: true },
+        { id: "m3", name: "小安", share: 1, role: "小孩", active: true }
       ],
       budgets: {
         "房租": 28000,
         "水電瓦斯": 4200,
         "餐飲": 12000,
         "日用品": 6000,
-        "娛樂": 5000
+        "旅遊": 10000,
+        "玩樂": 5000
       },
       transactions: [
         {
@@ -989,6 +1112,7 @@
           date: todayOffset(-18),
           title: "六月房租",
           category: "房租",
+          ledger: "family",
           amount: 28000,
           payerId: "m1",
           participantIds: ["m1", "m2", "m3"],
@@ -1000,6 +1124,7 @@
           date: todayOffset(-10),
           title: "超市採買",
           category: "日用品",
+          ledger: "family",
           amount: 3680,
           payerId: "m2",
           participantIds: ["m1", "m2", "m3"],
@@ -1011,6 +1136,7 @@
           date: todayOffset(-8),
           title: "共同基金入帳",
           category: "收入",
+          ledger: "shared",
           amount: 15000,
           payerId: "m3",
           participantIds: ["m1", "m2", "m3"],
@@ -1022,10 +1148,47 @@
           date: todayOffset(-3),
           title: "晚餐聚餐",
           category: "餐飲",
+          ledger: "fun",
           amount: 2460,
           payerId: "m1",
           participantIds: ["m1", "m2"],
           note: "小安未參與"
+        },
+        {
+          id: "t5",
+          type: "expense",
+          date: todayOffset(-2),
+          title: "台中兩天一夜訂房",
+          category: "旅遊",
+          ledger: "travel",
+          amount: 7200,
+          payerId: "m2",
+          participantIds: ["m1", "m2"],
+          note: "旅遊帳本"
+        },
+        {
+          id: "t6",
+          type: "expense",
+          date: todayOffset(-1),
+          title: "ETF 定期定額",
+          category: "投資本金",
+          ledger: "investment",
+          amount: 10000,
+          payerId: "m1",
+          participantIds: ["m1", "m2"],
+          note: "投資共同紀錄"
+        },
+        {
+          id: "t7",
+          type: "expense",
+          date: todayOffset(-1),
+          title: "幫買日用品",
+          category: "代買",
+          ledger: "purchase",
+          amount: 890,
+          payerId: "m3",
+          participantIds: ["m1"],
+          note: "怡君要歸還小安"
         }
       ]
     };
@@ -1052,18 +1215,26 @@
       settlementList: document.querySelector("#settlementList"),
       budgetList: document.querySelector("#budgetList"),
       filterType: document.querySelector("#filterType"),
+      filterLedger: document.querySelector("#filterLedger"),
       filterMember: document.querySelector("#filterMember"),
       filterMonth: document.querySelector("#filterMonth"),
       searchText: document.querySelector("#searchText"),
       category: document.querySelector("#category"),
+      ledger: document.querySelector("#ledger"),
       payer: document.querySelector("#payer"),
       participants: document.querySelector("#participants"),
       budgetCategory: document.querySelector("#budgetCategory"),
+      syncStatus: document.querySelector("#syncStatus"),
       toast: document.querySelector("#toast"),
       editId: document.querySelector("#editId"),
       formTitle: document.querySelector("#formTitle"),
       submitBtn: document.querySelector("#submitBtn"),
       cancelEdit: document.querySelector("#cancelEdit"),
+      memberEditId: document.querySelector("#memberEditId"),
+      memberRole: document.querySelector("#memberRole"),
+      memberActive: document.querySelector("#memberActive"),
+      memberSubmitBtn: document.querySelector("#memberSubmitBtn"),
+      cancelMemberEdit: document.querySelector("#cancelMemberEdit"),
       logout: document.querySelector("#logout")
     };
 
@@ -1079,14 +1250,18 @@
       unlockApp();
     }
 
-    function startApp() {
+    async function startApp() {
       if (appStarted) return;
       document.querySelector("#date").value = new Date().toISOString().slice(0, 10);
       els.filterMonth.value = new Date().toISOString().slice(0, 7);
       fillStaticSelects();
       bindEvents();
+      resetTransactionForm();
+      resetMemberForm();
       render();
       appStarted = true;
+      await syncFromRemote();
+      window.setInterval(syncFromRemote, 30000);
     }
 
     function bindAuthEvents() {
@@ -1159,7 +1334,7 @@
       document.querySelector("#budgetForm").addEventListener("submit", saveBudget);
       document.querySelector("#exportCsv").addEventListener("click", exportCsv);
       document.querySelector("#seedData").addEventListener("click", () => {
-        state = structuredClone(sampleState);
+        state = normalizeState(structuredClone(sampleState));
         persist();
         render();
         showToast("已載入範例資料");
@@ -1168,32 +1343,88 @@
       document.querySelector("#resetFilters").addEventListener("click", resetFilters);
       els.logout.addEventListener("click", lockApp);
       els.cancelEdit.addEventListener("click", resetTransactionForm);
-      [els.filterType, els.filterMember, els.filterMonth, els.searchText].forEach((field) => {
+      els.cancelMemberEdit.addEventListener("click", resetMemberForm);
+      els.category.addEventListener("change", () => {
+        if (currentType === "expense") {
+          els.ledger.value = inferLedger(els.category.value);
+        }
+      });
+      [els.filterType, els.filterLedger, els.filterMember, els.filterMonth, els.searchText].forEach((field) => {
         field.addEventListener("input", renderTransactions);
       });
     }
 
     function loadState() {
       try {
-        const raw = localStorage.getItem(storageKey);
-        if (!raw) return structuredClone(sampleState);
+        const raw = localStorage.getItem(storageKey) || localStorage.getItem(legacyStorageKey);
+        if (!raw) return normalizeState(structuredClone(sampleState));
         const parsed = JSON.parse(raw);
-        return {
-          members: Array.isArray(parsed.members) ? parsed.members : sampleState.members,
-          budgets: parsed.budgets || {},
-          transactions: Array.isArray(parsed.transactions) ? parsed.transactions : []
-        };
+        return normalizeState(parsed);
       } catch {
-        return structuredClone(sampleState);
+        return normalizeState(structuredClone(sampleState));
       }
     }
 
     function persist() {
+      state.updatedAt = Date.now();
+      state = normalizeState(state);
       localStorage.setItem(storageKey, JSON.stringify(state));
+      saveRemoteState();
+    }
+
+    function saveLocalOnly(nextState) {
+      state = normalizeState(nextState);
+      localStorage.setItem(storageKey, JSON.stringify(state));
+    }
+
+    function normalizeState(input) {
+      const next = input && typeof input === "object" ? input : {};
+      return {
+        updatedAt: Number(next.updatedAt || Date.now()),
+        members: Array.isArray(next.members) ? next.members.map(normalizeMember) : structuredClone(sampleState.members),
+        budgets: next.budgets && typeof next.budgets === "object" ? next.budgets : {},
+        transactions: Array.isArray(next.transactions) ? next.transactions.map(normalizeTransaction) : []
+      };
+    }
+
+    function normalizeMember(member) {
+      return {
+        id: member.id || makeId(),
+        name: member.name || "未命名",
+        share: Math.max(1, Number(member.share || 1)),
+        role: member.role || "家人",
+        active: member.active !== false
+      };
+    }
+
+    function normalizeTransaction(item) {
+      return {
+        id: item.id || makeId(),
+        type: item.type === "income" ? "income" : "expense",
+        date: item.date || new Date().toISOString().slice(0, 10),
+        title: item.title || "未命名項目",
+        category: item.category || "其他",
+        ledger: item.ledger || inferLedger(item.category),
+        amount: Number(item.amount || 0),
+        payerId: item.payerId || "",
+        participantIds: Array.isArray(item.participantIds) ? item.participantIds : [],
+        note: item.note || ""
+      };
+    }
+
+    function inferLedger(category) {
+      if (["投資本金", "投資收益", "投資損益"].includes(category)) return "investment";
+      if (category === "代買") return "purchase";
+      if (category === "旅遊") return "travel";
+      if (category === "玩樂" || category === "娛樂") return "fun";
+      return "family";
     }
 
     function fillStaticSelects() {
       els.category.innerHTML = categories.map((item) => `<option value="${escapeAttr(item)}">${escapeHtml(item)}</option>`).join("");
+      els.ledger.innerHTML = ledgers.map((item) => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("");
+      els.filterLedger.innerHTML = `<option value="all">全部</option>${ledgers.map((item) => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)}</option>`).join("")}`;
+      els.memberRole.innerHTML = memberRoles.map((item) => `<option value="${escapeAttr(item)}">${escapeHtml(item)}</option>`).join("");
       els.budgetCategory.innerHTML = categories
         .filter((item) => item !== "收入")
         .map((item) => `<option value="${escapeAttr(item)}">${escapeHtml(item)}</option>`)
@@ -1204,9 +1435,72 @@
     function syncCategoryForType() {
       if (currentType === "income") {
         els.category.value = "收入";
+        els.ledger.value = "shared";
       } else if (els.category.value === "收入") {
         els.category.value = "其他";
+        els.ledger.value = "family";
       }
+    }
+
+    async function syncFromRemote() {
+      if (window.location.protocol === "file:") {
+        setSyncStatus("local", "本機儲存");
+        return;
+      }
+
+      setSyncStatus("syncing", "同步中");
+      try {
+        const response = await fetch(remoteStateUrl, {
+          cache: "no-store",
+          headers: { "X-Joint-Account-Token": passwordHash }
+        });
+        if (response.status === 404 || response.status === 503) {
+          setSyncStatus("local", "尚未接資料庫");
+          return;
+        }
+        if (!response.ok) throw new Error("remote state unavailable");
+
+        const payload = await response.json();
+        if (!payload.updatedAt && !payload.members && !payload.transactions) {
+          await saveRemoteState();
+          return;
+        }
+
+        const remoteState = normalizeState(payload);
+        if (Number(remoteState.updatedAt || 0) > Number(state.updatedAt || 0)) {
+          saveLocalOnly(remoteState);
+          render();
+          showToast("已載入共同資料");
+        }
+        setSyncStatus("synced", "已同步");
+      } catch {
+        setSyncStatus("local", "本機儲存");
+      }
+    }
+
+    async function saveRemoteState() {
+      if (window.location.protocol === "file:") return;
+
+      try {
+        setSyncStatus("syncing", "同步中");
+        const response = await fetch(remoteStateUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Joint-Account-Token": passwordHash
+          },
+          body: JSON.stringify(state)
+        });
+        if (!response.ok) throw new Error("remote save unavailable");
+        setSyncStatus("synced", "已同步");
+      } catch {
+        setSyncStatus("local", "本機儲存");
+      }
+    }
+
+    function setSyncStatus(mode, text) {
+      els.syncStatus.className = `status-pill ${mode}`;
+      els.syncStatus.innerHTML = `<span class="sync-dot"></span>${escapeHtml(text)}`;
     }
 
     function render() {
@@ -1220,7 +1514,7 @@
 
     function renderSelectors() {
       const memberOptions = state.members
-        .map((member) => `<option value="${member.id}">${escapeHtml(member.name)}</option>`)
+        .map((member) => `<option value="${member.id}">${escapeHtml(member.name)}${member.active ? "" : "（停用）"}</option>`)
         .join("");
       els.payer.innerHTML = memberOptions;
       els.participants.innerHTML = memberOptions;
@@ -1280,6 +1574,7 @@
 
     function filteredTransactions() {
       const type = els.filterType.value;
+      const ledger = els.filterLedger.value;
       const memberId = els.filterMember.value;
       const month = els.filterMonth.value;
       const keyword = els.searchText.value.trim().toLowerCase();
@@ -1290,6 +1585,7 @@
         const haystack = `${item.title} ${item.category} ${item.note || ""} ${payer} ${participantNames}`.toLowerCase();
 
         if (type !== "all" && item.type !== type) return false;
+        if (ledger !== "all" && item.ledger !== ledger) return false;
         if (memberId !== "all" && item.payerId !== memberId && !item.participantIds.includes(memberId)) return false;
         if (month && item.date.slice(0, 7) !== month) return false;
         if (keyword && !haystack.includes(keyword)) return false;
@@ -1309,6 +1605,7 @@
               <tr>
                 <th>日期</th>
                 <th>項目</th>
+                <th>帳本</th>
                 <th>類型</th>
                 <th>類別</th>
                 <th>付款人</th>
@@ -1334,6 +1631,7 @@
         <tr>
           <td>${escapeHtml(item.date)}</td>
           <td><strong>${escapeHtml(item.title)}</strong>${item.note ? `<br><span class="muted">${escapeHtml(item.note)}</span>` : ""}</td>
+          <td><span class="tag">${escapeHtml(ledgerLabel(item.ledger))}</span></td>
           <td><span class="type-pill ${item.type}">${item.type === "income" ? "收入" : "支出"}</span></td>
           <td>${escapeHtml(item.category)}</td>
           <td>${escapeHtml(payer)}</td>
@@ -1364,10 +1662,17 @@
                   <span class="avatar">${escapeHtml(member.name.slice(0, 1))}</span>
                   <div>
                     <strong>${escapeHtml(member.name)}</strong>
-                    <div class="muted">分攤比例 ${member.share}</div>
+                    <div class="tag-row">
+                      <span class="tag">${escapeHtml(member.role)}</span>
+                      <span class="tag">比例 ${member.share}</span>
+                      <span class="tag">${member.active ? "啟用" : "停用"}</span>
+                    </div>
                   </div>
                 </div>
-                <button class="icon-btn" title="刪除成員" onclick="deleteMember('${member.id}')">刪</button>
+                <div class="row-actions">
+                  <button class="icon-btn" title="編輯成員" onclick="editMember('${member.id}')">編</button>
+                  <button class="icon-btn" title="刪除成員" onclick="deleteMember('${member.id}')">刪</button>
+                </div>
               </div>
               <div class="mini-stat"><span>已付款</span><strong>${currency.format(balance.paid)}</strong></div>
               <div class="mini-stat"><span>應分攤</span><strong>${currency.format(balance.owed)}</strong></div>
@@ -1490,6 +1795,7 @@
         date: document.querySelector("#date").value,
         title: document.querySelector("#title").value.trim(),
         category: els.category.value,
+        ledger: els.ledger.value,
         amount: Number(document.querySelector("#amount").value),
         payerId: els.payer.value,
         participantIds: selectedParticipants.length ? selectedParticipants : [els.payer.value],
@@ -1525,6 +1831,7 @@
       document.querySelector("#amount").value = item.amount;
       document.querySelector("#title").value = item.title;
       els.category.value = item.category;
+      els.ledger.value = item.ledger || inferLedger(item.category);
       els.payer.value = item.payerId;
       document.querySelector("#note").value = item.note || "";
       Array.from(els.participants.options).forEach((option) => {
@@ -1532,7 +1839,7 @@
       });
       els.formTitle.textContent = "編輯交易";
       els.submitBtn.textContent = "儲存交易";
-      els.cancelEdit.hidden = false;
+      els.cancelEdit.classList.remove("hidden");
       showToast("已載入交易");
     }
 
@@ -1553,7 +1860,7 @@
       });
       els.formTitle.textContent = "新增交易";
       els.submitBtn.textContent = "加入交易";
-      els.cancelEdit.hidden = true;
+      els.cancelEdit.classList.add("hidden");
       renderSelectors();
       syncCategoryForType();
     }
@@ -1562,13 +1869,47 @@
       event.preventDefault();
       const name = document.querySelector("#memberName").value.trim();
       const share = Math.max(1, Number(document.querySelector("#memberShare").value || 1));
+      const member = {
+        id: els.memberEditId.value || makeId(),
+        name,
+        share,
+        role: els.memberRole.value,
+        active: els.memberActive.checked
+      };
       if (!name) return;
-      state.members.push({ id: makeId(), name, share });
+      if (els.memberEditId.value) {
+        state.members = state.members.map((item) => item.id === member.id ? member : item);
+        showToast("成員設定已更新");
+      } else {
+        state.members.push(member);
+        showToast("成員已新增");
+      }
       persist();
-      event.target.reset();
-      document.querySelector("#memberShare").value = 1;
+      resetMemberForm();
       render();
-      showToast("成員已新增");
+    }
+
+    function editMember(id) {
+      const member = state.members.find((item) => item.id === id);
+      if (!member) return;
+      els.memberEditId.value = member.id;
+      document.querySelector("#memberName").value = member.name;
+      document.querySelector("#memberShare").value = member.share;
+      els.memberRole.value = member.role || "家人";
+      els.memberActive.checked = member.active !== false;
+      els.memberSubmitBtn.textContent = "儲存成員";
+      els.cancelMemberEdit.classList.remove("hidden");
+      showToast("已載入成員設定");
+    }
+
+    function resetMemberForm() {
+      document.querySelector("#memberForm").reset();
+      els.memberEditId.value = "";
+      document.querySelector("#memberShare").value = 1;
+      els.memberRole.value = "家人";
+      els.memberActive.checked = true;
+      els.memberSubmitBtn.textContent = "新增成員";
+      els.cancelMemberEdit.classList.add("hidden");
     }
 
     function deleteMember(id) {
@@ -1604,6 +1945,7 @@
     function resetFilters() {
       els.searchText.value = "";
       els.filterType.value = "all";
+      els.filterLedger.value = "all";
       els.filterMember.value = "all";
       els.filterMonth.value = new Date().toISOString().slice(0, 7);
       renderTransactions();
@@ -1620,9 +1962,10 @@
     }
 
     function exportCsv() {
-      const header = ["日期", "類型", "類別", "項目", "付款人", "分攤對象", "金額", "備註"];
+      const header = ["日期", "帳本", "類型", "類別", "項目", "付款人", "分攤對象", "金額", "備註"];
       const rows = sortedTransactions().map((item) => [
         item.date,
+        ledgerLabel(item.ledger),
         item.type === "income" ? "收入" : "支出",
         item.category,
         item.title,
@@ -1645,6 +1988,10 @@
 
     function findMember(id) {
       return state.members.find((member) => member.id === id);
+    }
+
+    function ledgerLabel(id) {
+      return ledgers.find((item) => item.id === id)?.name || "家庭";
     }
 
     function emptyState(text) {
